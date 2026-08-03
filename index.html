@@ -18,710 +18,280 @@
             --card-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        * {
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
+        * { box-sizing: border-box; transition: all 0.3s ease; }
 
         body {
-            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            margin: 0; padding: 0;
             background-color: var(--light-bg);
             color: var(--dark);
-            overflow-x: hidden;
         }
 
-        /* Navbar Design */
         .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 25px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 25px; background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: sticky; top: 0; z-index: 100;
         }
 
-        .nav-icons {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+        .nav-icons { display: flex; align-items: center; gap: 15px; }
 
         .menu-btn {
-            background: #fff;
-            border: 2px solid var(--yellow);
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-        }
-
-        .menu-btn:hover {
-            transform: scale(1.08);
-            background: var(--yellow);
+            background: #fff; border: 2px solid var(--yellow);
+            width: 45px; height: 45px; border-radius: 12px;
+            font-size: 1.5rem; cursor: pointer;
         }
 
         .profile-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
+            width: 45px; height: 45px; border-radius: 50%;
             background: linear-gradient(135deg, var(--yellow), var(--orange));
-            border: 2px solid #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.3rem;
-            box-shadow: 0 4px 10px rgba(255,107,0,0.3);
+            border: 2px solid #fff; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; font-size: 1.3rem;
         }
 
-        .profile-btn:hover {
-            transform: rotate(15deg) scale(1.1);
-        }
-
-        .lang-btn {
-            background: linear-gradient(135deg, #2196F3, #1e88e5);
-            color: white;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(33,150,243,0.3);
-        }
-
-        .lang-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(33,150,243,0.4);
-        }
-
-        /* Side Navigation Dropdown */
         .side-menu {
-            display: none;
-            position: fixed;
-            top: 70px;
-            right: 20px;
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            width: 240px;
-            z-index: 200;
-            overflow: hidden;
-            border: 2px solid var(--yellow);
-        }
-
-        html[dir="ltr"] .side-menu {
-            right: auto;
-            left: 20px;
+            display: none; position: fixed; top: 70px; right: 20px;
+            background: #ffffff; border-radius: 15px; width: 240px;
+            z-index: 200; border: 2px solid var(--yellow);
         }
 
         .side-menu a {
-            display: block;
-            padding: 14px 20px;
-            text-decoration: none;
-            color: var(--dark);
-            font-weight: 700;
-            border-bottom: 1px solid #f0f0f0;
+            display: block; padding: 14px 20px; text-decoration: none;
+            color: var(--dark); font-weight: 700; border-bottom: 1px solid #f0f0f0;
             cursor: pointer;
         }
 
-        .side-menu a:hover {
-            background-color: var(--yellow);
-            color: var(--dark);
-            padding-right: 28px;
-        }
+        .side-menu a:hover { background-color: var(--yellow); }
 
-        /* Page Layout */
-        .page {
-            display: none;
-            animation: slideUp 0.4s ease-out;
-            padding-bottom: 50px;
-        }
+        .page { display: none; padding-bottom: 50px; }
+        .page.active { display: block; }
 
-        .page.active {
-            display: block;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Hero Banner */
         .hero {
             background: linear-gradient(135deg, var(--primary), var(--orange));
-            color: white;
-            text-align: center;
-            padding: 50px 20px;
-            border-bottom-left-radius: 40px;
-            border-bottom-right-radius: 40px;
-            box-shadow: 0 10px 25px rgba(227,0,11,0.2);
-            position: relative;
+            color: white; text-align: center; padding: 50px 20px;
+            border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
         }
 
-        .hero h1 {
-            font-size: 2.8rem;
-            margin-bottom: 15px;
-            font-weight: 900;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
+        .hero-image-container { max-width: 800px; margin: -30px auto 40px; padding: 0 20px; }
+        .main-card img { width: 100%; border-radius: 20px; border: 5px solid var(--yellow); }
 
-        .hero p {
-            font-size: 1.25rem;
-            max-width: 650px;
-            margin: 0 auto 25px;
-            line-height: 1.6;
-        }
-
-        /* Hero Image Container */
-        .hero-image-container {
-            max-width: 800px;
-            margin: -30px auto 40px;
-            padding: 0 20px;
-        }
-
-        .main-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            border: 5px solid var(--yellow);
-            transform: translateY(0);
-            cursor: pointer;
-        }
-
-        .main-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-
-        .main-card img {
-            width: 100%;
-            height: auto;
-            max-height: 500px;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* Lego Showcase Gallery */
         .lego-gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
-            max-width: 1100px;
-            margin: 30px auto;
-            padding: 0 20px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px; max-width: 1100px; margin: 30px auto; padding: 0 20px;
         }
 
         .gallery-card {
-            background: white;
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            border: 3px solid #fff;
-            position: relative;
-            cursor: pointer;
+            background: white; border-radius: 18px; overflow: hidden;
+            box-shadow: var(--card-shadow); border: 3px solid #fff; cursor: pointer;
         }
 
-        .gallery-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: var(--yellow);
-            box-shadow: 0 15px 30px rgba(255, 207, 0, 0.3);
-        }
+        .gallery-card img { width: 100%; height: 200px; object-fit: cover; }
+        .gallery-card .card-title { padding: 12px; font-weight: 800; text-align: center; }
 
-        .gallery-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            display: block;
-        }
-
-        .gallery-card .card-title {
-            padding: 12px 15px;
-            font-weight: 800;
-            font-size: 1rem;
-            text-align: center;
-            background: #ffffff;
-            color: var(--dark);
-            border-top: 2px solid var(--light-bg);
-        }
-
-        /* Section Box */
         .section-box {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: var(--card-shadow);
+            max-width: 800px; margin: 40px auto; padding: 30px;
+            background: white; border-radius: 20px; box-shadow: var(--card-shadow);
         }
 
-        .section-box h2 {
-            color: var(--primary);
-            border-bottom: 4px solid var(--yellow);
-            padding-bottom: 10px;
-            display: inline-block;
-            margin-top: 0;
-            font-size: 1.8rem;
-        }
-
-        .upload-box {
-            border: 3px dashed var(--yellow);
-            padding: 35px;
-            border-radius: 15px;
-            text-align: center;
-            background: #fffdf0;
-        }
-
-        /* Buttons */
         .btn {
             background: linear-gradient(135deg, var(--yellow), #ffb700);
-            color: var(--dark);
-            padding: 14px 35px;
-            font-size: 1.15rem;
-            font-weight: 800;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            box-shadow: 0 6px 15px rgba(255,207,0,0.4);
+            color: var(--dark); padding: 12px 30px; font-weight: 800;
+            border: none; border-radius: 30px; cursor: pointer;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            box-shadow: 0 6px 15px rgba(227,0,11,0.3);
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+
+        .comment-item {
+            background: #f8f9fa; padding: 12px 18px; border-radius: 12px;
+            margin-top: 12px; border-right: 5px solid var(--yellow);
         }
 
-        .btn:hover {
-            transform: translateY(-3px) scale(1.02);
-        }
-
-        /* Modals & Lightbox */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 35px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 420px;
-            width: 90%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            border: 4px solid var(--yellow);
-        }
-
-        /* Lightbox Image Zoom Overlay */
         .lightbox-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            backdrop-filter: blur(8px);
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center; z-index: 2000;
         }
+        .lightbox-modal img { max-width: 90%; max-height: 85vh; border-radius: 15px; }
 
-        .lightbox-modal img {
-            max-width: 90%;
-            max-height: 85vh;
-            border-radius: 15px;
-            border: 4px solid var(--yellow);
-            box-shadow: 0 0 30px rgba(255, 207, 0, 0.5);
-            object-fit: contain;
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000;
         }
-
-        .lightbox-close {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: white;
-            font-size: 2.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .lightbox-close:hover {
-            color: var(--yellow);
-        }
-
-        .social-links {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .social-btn {
-            padding: 14px;
-            border-radius: 12px;
-            text-decoration: none;
-            color: white;
-            font-weight: 800;
-            display: block;
-        }
-
-        .youtube { background: linear-gradient(135deg, #ff0000, #cc0000); }
-        .telegram { background: linear-gradient(135deg, #0088cc, #006699); }
-
-        .comment-box textarea {
-            width: 100%;
-            height: 100px;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            resize: vertical;
-            font-family: inherit;
-        }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; }
     </style>
 </head>
 <body>
 
     <header class="navbar">
         <div class="nav-icons">
-            <button class="menu-btn" onclick="toggleSideMenu()" title="القائمة">☰</button>
-            <div class="profile-btn" onclick="openAuthModal()" title="تسجيل الدخول">👤</div>
+            <button class="menu-btn" onclick="toggleSideMenu()">☰</button>
+            <div class="profile-btn" onclick="openAuthModal()">👤</div>
         </div>
-        <button class="lang-btn" onclick="toggleLanguage()" id="langToggleBtn">English 🌐</button>
+        <h2>Lego City 🧱</h2>
     </header>
 
     <nav class="side-menu" id="sideMenu">
-        <a onclick="showPage('homePage')" id="menuHome">الصفحة الرئيسية 🏠</a>
-        <a onclick="showPage('sharePage')" id="menuShare">شارك مشروعك 🚀</a>
-        <a onclick="showPage('libraryPage')" id="menuLibrary">مكتبة تصاميمي 🖼️</a>
-        <a onclick="showPage('commentsPage')" id="menuComments">التعليقات والمناقشات 💬</a>
+        <a onclick="showPage('homePage')">الصفحة الرئيسية 🏠</a>
+        <a onclick="showPage('sharePage')">شارك مشروعك 🚀</a>
+        <a onclick="showPage('libraryPage')">مكتبة التصاميم العامة 🖼️</a>
+        <a onclick="showPage('commentsPage')">التعليقات والمناقشات 💬</a>
     </nav>
 
     <div id="homePage" class="page active">
         <section class="hero">
-            <h1 id="title">مرحباً بكم في عالم Lego City! 🧱</h1>
-            <p id="desc">
-                استكشف عالم الإبداع والابتكار! نقدم لك أحدث أفكار وتصاميم ألعاب الليجو ونعلمك البناء والاحتراف خطوة بخطوة.
-            </p>
-            <button class="btn" onclick="openModal()" id="joinBtn">انضم إلينا الآن 🌟</button>
+            <h1>مرحباً بكم في عالم Lego City! 🧱</h1>
+            <p>استكشف الإبداع والابتكار وشاهد مجسمات الليجو الجبارة!</p>
         </section>
-
         <div class="hero-image-container">
-            <div class="main-card" onclick="zoomImage(this.querySelector('img').src)">
-                <img src="lego.jpg" alt="تصميم ليجو مميز">
-            </div>
-        </div>
-
-        <div style="text-align: center;">
-            <h2 style="color: var(--primary); font-size: 2rem; font-weight: 900;">معرض تصاميم ومجسمات الليجو 🧱✨</h2>
-            <p style="color: #666; font-size: 1.1rem;">اضغط على أي صورة للتكبير والعبور لشاشة كاملة</p>
-        </div>
-
-        <div class="lego-gallery-grid">
-            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
-                <img src="https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?q=80&w=800&auto=format&fit=crop" alt="Lego City Center">
-                <div class="card-title">مدينة ليجو متكاملة 🏙️</div>
-            </div>
-            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
-                <img src="https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=800&auto=format&fit=crop" alt="Lego Minifigures">
-                <div class="card-title">شخصيات ومجسمات الليجو 👤</div>
-            </div>
-            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
-                <img src="https://images.unsplash.com/photo-1611605698335-8b1569810432?q=80&w=800&auto=format&fit=crop" alt="Lego Race Car">
-                <div class="card-title">سيارة سباق من الليجو 🏎️</div>
-            </div>
-            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
-                <img src="https://images.unsplash.com/photo-1587654780291-39c9404d746b?q=80&w=800&auto=format&fit=crop" alt="Lego Bricks">
-                <div class="card-title">تشكيلة قطع مكعبات زاهية 🧩</div>
+            <div class="main-card" onclick="zoomImage('lego.jpg')">
+                <img src="lego.jpg" alt="تصميم ليجو">
             </div>
         </div>
     </div>
 
     <div id="sharePage" class="page">
         <section class="section-box">
-            <h2 id="shareTitle">شارك مشروعك 🚀</h2>
-            <p id="shareDesc">قم برفع صورة تصميمك ليتم حفظها وعرضها مباشرة في "مكتبة تصاميمي":</p>
-            
-            <div class="upload-box">
-                <input type="file" id="projectImageInput" accept="image/*">
-                <br><br>
-                <button class="btn btn-primary" onclick="uploadProject()" id="sendBtn">إرسال المشروع / Send</button>
-            </div>
+            <h2>شارك مشروعك مع الجميع 🚀</h2>
+            <p>اختر صورة لتظهر لكل زوار الموقع في المكتبة العامة:</p>
+            <input type="file" id="projectImageInput" accept="image/*"><br><br>
+            <button class="btn btn-primary" onclick="uploadPublicProject()">نشر للجميع 🔥</button>
         </section>
     </div>
 
     <div id="libraryPage" class="page">
         <section class="section-box">
-            <h2 id="libraryTitle">مكتبة تصاميمي 🖼️</h2>
-            <p id="libraryDesc">معرض المشاريع والتصاميم التي قمت برفعها (اضغط على الصورة لتكبيرها):</p>
-
-            <div id="libraryGallery" class="lego-gallery-grid">
-                <p id="emptyLibraryMsg" style="color: #888; width: 100%; text-align: center;">لم تقم برفع أي صور حتى الآن!</p>
-            </div>
+            <h2>معرض تصاميم الأعضاء 🖼️</h2>
+            <div id="publicGallery" class="lego-gallery-grid"></div>
         </section>
     </div>
 
     <div id="commentsPage" class="page">
         <section class="section-box">
-            <h2 id="commentsTitle">مجتمع الأعضاء والتعليقات 💬</h2>
-            <p id="commentsDesc">شارك أفكارك مع بقية المبدعين أو اترك استفساراتك هنا:</p>
-            
-            <div class="comment-box">
-                <textarea id="commentInput" placeholder="اكتب تعليقك هنا..."></textarea>
-                <br><br>
-                <button class="btn btn-primary" onclick="addComment()" id="submitCommentBtn">إرسال التعليق</button>
-            </div>
+            <h2>مجتمع الأعضاء والتعليقات العامة 💬</h2>
+            <textarea id="commentInput" placeholder="اكتب تعليقك هنا ليراه الجميع..." style="width:100%; height:80px; padding:10px; border-radius:10px;"></textarea><br><br>
+            <button class="btn btn-primary" onclick="addPublicComment()">نشر التعليق 🚀</button>
 
-            <div id="commentsList" style="margin-top: 25px;"></div>
+            <div id="commentsList"></div>
         </section>
     </div>
 
     <div class="lightbox-modal" id="lightboxModal" onclick="closeZoom()">
-        <span class="lightbox-close" onclick="closeZoom()">&times;</span>
-        <img id="lightboxImage" src="" alt="Zoomed Image">
+        <img id="lightboxImage" src="">
     </div>
 
     <div class="modal" id="authModal">
         <div class="modal-content">
-            <h3 id="authTitle">تسجيل الدخول</h3>
-            <p id="authDesc">انضم وسجل دخولك عبر حساب جوجل:</p>
-
+            <h3>تسجيل الدخول</h3>
             <div id="g_id_onload"
                  data-client_id="785859751432-8p7jq09n3vqhg8nooj76cne27u2loj77.apps.googleusercontent.com"
                  data-callback="handleCredentialResponse">
             </div>
-
-            <div style="display: flex; justify-content: center; margin-top: 15px;">
-                <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-size="large"></div>
-            </div>
-
-            <br>
-            <span style="cursor:pointer; color:#888; text-decoration:underline;" onclick="closeAuthModal()" id="closeAuthBtn">إغلاق</span>
+            <div class="g_id_signin" data-type="standard"></div>
+            <br><button class="btn" onclick="closeAuthModal()">إغلاق</button>
         </div>
     </div>
 
-    <div class="modal" id="subscribeModal">
-        <div class="modal-content">
-            <h3 id="modalTitle">انضم إلى قنواتنا الرسمية!</h3>
-            <p id="modalDesc">اشترك لتتابع أحدث شروحات البناء والتصاميم:</p>
-            
-            <div class="social-links">
-                <a href="https://www.youtube.com/@lego-city-woooo" target="_blank" class="social-btn youtube" onclick="enableNextStep()" id="ytBtn">قناة YouTube 🎥</a>
-                <a href="https://t.me/Legocitywooo" target="_blank" class="social-btn telegram" onclick="enableNextStep()" id="tgBtn">قناة Telegram ✈️</a>
-            </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-            <div id="nextStep" style="display: none;">
-                <hr>
-                <p id="googleText">سجل دخولك الآن:</p>
-                <div style="display: flex; justify-content: center;">
-                    <div class="g_id_signin" data-type="standard" data-shape="pill"></div>
-                </div>
-            </div>
-            
-            <br>
-            <span style="cursor:pointer; color:#888; text-decoration:underline;" onclick="closeModal()" id="closeBtn">إغلاق</span>
-        </div>
-    </div>
+        // 🔥 تم وضع كود firebaseConfig الخاص بك هنا بنجاح
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdw7H62c6teBPAiziUQ1_Ye4seCs5gRpA",
+            authDomain: "lego-city-fb3fc.firebaseapp.com",
+            projectId: "lego-city-fb3fc",
+            storageBucket: "lego-city-fb3fc.firebasestorage.app",
+            messagingSenderId: "467768703245",
+            appId: "1:467768703245:web:56fea19e58f471d0d61844",
+            measurementId: "G-EFR8Q084YD"
+        };
 
-    <script>
-        let currentLang = 'ar';
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        const translations = {
-            ar: {
-                langBtn: "English 🌐",
-                menuHome: "الصفحة الرئيسية 🏠",
-                menuShare: "شارك مشروعك 🚀",
-                menuLibrary: "مكتبة تصاميمي 🖼️",
-                menuComments: "التعليقات والمناقشات 💬",
-                title: "مرحباً بكم في عالم Lego City! 🧱",
-                desc: "استكشف عالم الإبداع والابتكار! نقدم لك أحدث أفكار وتصاميم ألعاب الليجو ونعلمك البناء والاحتراف خطوة بخطوة.",
-                joinBtn: "انضم إلينا الآن 🌟",
-                shareTitle: "شارك مشروعك 🚀",
-                shareDesc: "قم برفع صورة تصميمك ليتم حفظها وعرضها مباشرة في \"مكتبة تصاميمي\":",
-                sendBtn: "إرسال المشروع / Send",
-                libraryTitle: "مكتبة تصاميمي 🖼️",
-                libraryDesc: "معرض المشاريع والتصاميم التي قمت برفعها (اضغط على الصورة لتكبيرها):",
-                emptyLibraryMsg: "لم تقم برفع أي صور حتى الآن!",
-                authTitle: "تسجيل الدخول",
-                authDesc: "انضم وسجل دخولك عبر حساب جوجل:",
-                closeAuthBtn: "إغلاق",
-                modalTitle: "انضم إلى قنواتنا الرسمية!",
-                modalDesc: "اشترك لتتابع أحدث شروحات البناء والتصاميم:",
-                ytBtn: "قناة YouTube 🎥",
-                tgBtn: "قناة Telegram ✈️",
-                googleText: "سجل دخولك الآن:",
-                closeBtn: "إغلاق",
-                commentsTitle: "مجتمع الأعضاء والتعليقات 💬",
-                commentsDesc: "شارك أفكارك مع بقية المبدعين أو اترك استفساراتك هنا:",
-                commentPlaceholder: "اكتب تعليقك هنا...",
-                submitCommentBtn: "إرسال التعليق",
-                emptyAlert: "يرجى كتابة نص التعليق أولاً!",
-                fileAlert: "يرجى اختيار صورة من جهازك أولاً!",
-                uploadSuccessAlert: "تم رفع صورتك ونقلها إلى مكتبة تصاميمك بنجاح! 🎉",
-                loginSuccess: "تم تسجيل الدخول بنجاح! 🚀"
-            },
-            en: {
-                langBtn: "العربية 🌐",
-                menuHome: "Home Page 🏠",
-                menuShare: "Share Your Project 🚀",
-                menuLibrary: "My Designs Library 🖼️",
-                menuComments: "Comments 💬",
-                title: "Welcome to Lego City! 🧱",
-                desc: "Explore creativity and innovation! We present top Lego build designs and step-by-step tutorials.",
-                joinBtn: "Join Us Now 🌟",
-                shareTitle: "Share Your Project 🚀",
-                shareDesc: "Upload your creation image to add it directly into 'My Designs Library':",
-                sendBtn: "Send Project",
-                libraryTitle: "My Designs Library 🖼️",
-                libraryDesc: "Your personal gallery of uploaded designs (Click on any image to zoom in):",
-                emptyLibraryMsg: "You haven't uploaded any designs yet!",
-                authTitle: "Sign In",
-                authDesc: "Sign in using your Google account:",
-                closeAuthBtn: "Close",
-                modalTitle: "Join Our Official Channels!",
-                modalDesc: "Subscribe to stay updated with Lego building techniques:",
-                ytBtn: "YouTube Channel 🎥",
-                tgBtn: "Telegram Channel ✈️",
-                googleText: "Sign in now:",
-                closeBtn: "Close",
-                commentsTitle: "Community & Comments 💬",
-                commentsDesc: "Share your thoughts or ask questions with the community:",
-                commentPlaceholder: "Type your comment here...",
-                submitCommentBtn: "Post Comment",
-                emptyAlert: "Please type a comment first!",
-                fileAlert: "Please choose an image from your device first!",
-                uploadSuccessAlert: "Image successfully added to My Designs Library! 🎉",
-                loginSuccess: "Successfully signed in! 🚀"
+        // جلب التعليقات العامة فوراً وبشكل حي لكل الزوار
+        const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
+        onSnapshot(qComments, (snapshot) => {
+            const list = document.getElementById('commentsList');
+            if (list) {
+                list.innerHTML = '';
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const div = document.createElement('div');
+                    div.className = 'comment-item';
+                    div.innerText = data.text;
+                    list.appendChild(div);
+                });
+            }
+        });
+
+        // جلب الصور العامة لكل الزوار
+        const qImages = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
+        onSnapshot(qImages, (snapshot) => {
+            const gallery = document.getElementById('publicGallery');
+            if (gallery) {
+                gallery.innerHTML = '';
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const card = document.createElement('div');
+                    card.className = 'gallery-card';
+                    card.onclick = () => window.zoomImage(data.url);
+                    card.innerHTML = `<img src="${data.url}"><div class="card-title">تصميم مشترك 🧩</div>`;
+                    gallery.appendChild(card);
+                });
+            }
+        });
+
+        // إضافة تعليق عام
+        window.addPublicComment = async function() {
+            const input = document.getElementById('commentInput');
+            if(input.value.trim()) {
+                await addDoc(collection(db, "comments"), {
+                    text: input.value.trim(),
+                    timestamp: new Date()
+                });
+                input.value = '';
             }
         };
 
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
+        // نشر صورة للمكتبة العامة
+        window.uploadPublicProject = function() {
+            const file = document.getElementById('projectImageInput').files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    await addDoc(collection(db, "gallery"), {
+                        url: e.target.result,
+                        timestamp: new Date()
+                    });
+                    alert('تم نشر تصميمك للجميع بنجاح! 🎉');
+                    showPage('libraryPage');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+    </script>
+
+    <script>
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
             document.getElementById('sideMenu').style.display = 'none';
         }
 
         function toggleSideMenu() {
-            const menu = document.getElementById('sideMenu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            const m = document.getElementById('sideMenu');
+            m.style.display = m.style.display === 'block' ? 'none' : 'block';
         }
 
         function zoomImage(src) {
-            const modal = document.getElementById('lightboxModal');
-            const img = document.getElementById('lightboxImage');
-            img.src = src;
-            modal.style.display = 'flex';
+            document.getElementById('lightboxImage').src = src;
+            document.getElementById('lightboxModal').style.display = 'flex';
         }
 
-        function closeZoom() {
-            document.getElementById('lightboxModal').style.display = 'none';
-        }
-
+        function closeZoom() { document.getElementById('lightboxModal').style.display = 'none'; }
         function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
         function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
-        function openModal() { document.getElementById('subscribeModal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('subscribeModal').style.display = 'none'; }
-        function enableNextStep() { document.getElementById('nextStep').style.display = 'block'; }
-
-        function handleCredentialResponse(response) {
-            alert(translations[currentLang].loginSuccess);
-            closeAuthModal();
-            closeModal();
-        }
-
-        function uploadProject() {
-            const fileInput = document.getElementById('projectImageInput');
-            const file = fileInput.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const gallery = document.getElementById('libraryGallery');
-                    const emptyMsg = document.getElementById('emptyLibraryMsg');
-                    if(emptyMsg) emptyMsg.style.display = 'none';
-
-                    const card = document.createElement('div');
-                    card.className = 'gallery-card';
-                    card.onclick = function() { zoomImage(e.target.result); };
-                    card.innerHTML = `<img src="${e.target.result}" alt="Project"><div class="card-title">تصميم جديد 🎉</div>`;
-                    
-                    gallery.appendChild(card);
-                    fileInput.value = '';
-                    alert(translations[currentLang].uploadSuccessAlert);
-                    showPage('libraryPage');
-                };
-                reader.readAsDataURL(file);
-            } else {
-                alert(translations[currentLang].fileAlert);
-            }
-        }
-
-        function addComment() {
-            const textarea = document.getElementById('commentInput');
-            const text = textarea.value.trim();
-            if(text) {
-                const list = document.getElementById('commentsList');
-                const comment = document.createElement('div');
-                comment.style.cssText = "background: #f8f9fa; padding: 12px; border-radius: 10px; margin-top: 10px; border-right: 4px solid var(--yellow);";
-                comment.innerText = text;
-                list.appendChild(comment);
-                textarea.value = '';
-            } else {
-                alert(translations[currentLang].emptyAlert);
-            }
-        }
-
-        function toggleLanguage() {
-            const html = document.getElementById('htmlTag');
-            currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            html.setAttribute('lang', currentLang);
-            html.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
-
-            const t = translations[currentLang];
-            document.getElementById('langToggleBtn').innerText = t.langBtn;
-            document.getElementById('menuHome').innerText = t.menuHome;
-            document.getElementById('menuShare').innerText = t.menuShare;
-            document.getElementById('menuLibrary').innerText = t.menuLibrary;
-            document.getElementById('menuComments').innerText = t.menuComments;
-            document.getElementById('title').innerText = t.title;
-            document.getElementById('desc').innerText = t.desc;
-            document.getElementById('joinBtn').innerText = t.joinBtn;
-            document.getElementById('shareTitle').innerText = t.shareTitle;
-            document.getElementById('shareDesc').innerText = t.shareDesc;
-            document.getElementById('sendBtn').innerText = t.sendBtn;
-            document.getElementById('libraryTitle').innerText = t.libraryTitle;
-            document.getElementById('libraryDesc').innerText = t.libraryDesc;
-            const emptyMsg = document.getElementById('emptyLibraryMsg');
-            if(emptyMsg) emptyMsg.innerText = t.emptyLibraryMsg;
-            document.getElementById('authTitle').innerText = t.authTitle;
-            document.getElementById('authDesc').innerText = t.authDesc;
-            document.getElementById('closeAuthBtn').innerText = t.closeAuthBtn;
-            document.getElementById('modalTitle').innerText = t.modalTitle;
-            document.getElementById('modalDesc').innerText = t.modalDesc;
-            document.getElementById('ytBtn').innerText = t.ytBtn;
-            document.getElementById('tgBtn').innerText = t.tgBtn;
-            document.getElementById('googleText').innerText = t.googleText;
-            document.getElementById('closeBtn').innerText = t.closeBtn;
-            document.getElementById('commentsTitle').innerText = t.commentsTitle;
-            document.getElementById('commentsDesc').innerText = t.commentsDesc;
-            document.getElementById('commentInput').placeholder = t.commentPlaceholder;
-            document.getElementById('submitCommentBtn').innerText = t.submitCommentBtn;
-        }
+        function handleCredentialResponse() { closeAuthModal(); }
     </script>
 </body>
 </html>
