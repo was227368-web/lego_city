@@ -28,7 +28,6 @@
             overflow-x: hidden;
         }
 
-        /* Navbar Header */
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 12px 25px; background: rgba(255, 255, 255, 0.95);
@@ -45,10 +44,7 @@
             box-shadow: 0 3px 8px rgba(0,0,0,0.1);
         }
 
-        .menu-btn:hover {
-            transform: scale(1.08);
-            background: var(--yellow);
-        }
+        .menu-btn:hover { transform: scale(1.08); background: var(--yellow); }
 
         .profile-btn {
             width: 45px; height: 45px; border-radius: 50%;
@@ -67,12 +63,6 @@
             cursor: pointer; font-weight: bold; box-shadow: 0 4px 12px rgba(33,150,243,0.3);
         }
 
-        .lang-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(33,150,243,0.4);
-        }
-
-        /* Side Navigation Dropdown */
         .side-menu {
             display: none; position: fixed; top: 70px; right: 20px;
             background: #ffffff; border-radius: 15px; width: 250px;
@@ -90,7 +80,6 @@
 
         .side-menu a:hover { background-color: var(--yellow); color: var(--dark); }
 
-        /* Page Layout */
         .page { display: none; padding-bottom: 50px; animation: slideUp 0.4s ease-out; }
         .page.active { display: block; }
 
@@ -99,7 +88,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Hero Banner */
         .hero {
             background: linear-gradient(135deg, var(--primary), var(--orange));
             color: white; text-align: center; padding: 50px 20px;
@@ -110,12 +98,10 @@
         .hero h1 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 900; }
         .hero p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 20px; opacity: 0.9; }
 
-        /* Hero Image Container */
         .hero-image-container { max-width: 800px; margin: -30px auto 40px; padding: 0 20px; }
         .main-card { cursor: pointer; border-radius: 20px; overflow: hidden; }
         .main-card img { width: 100%; border-radius: 20px; border: 5px solid var(--yellow); box-shadow: var(--card-shadow); display: block; }
 
-        /* Galleries Layout */
         .lego-gallery-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 20px; max-width: 1100px; margin: 30px auto; padding: 0 20px;
@@ -131,7 +117,6 @@
         .gallery-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
         .gallery-card .card-title { padding: 12px; font-weight: 800; text-align: center; background: #fff; }
 
-        /* Boxes & Sections */
         .section-box {
             max-width: 800px; margin: 40px auto; padding: 30px;
             background: white; border-radius: 20px; box-shadow: var(--card-shadow);
@@ -147,22 +132,12 @@
             border-radius: 15px; text-align: center; background: #fffdf0;
         }
 
-        /* Success Message Alert UI */
         #uploadStatusMsg {
-            margin-top: 15px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            padding: 10px;
-            border-radius: 10px;
-            display: none;
+            margin-top: 15px; font-weight: 800; font-size: 1.1rem;
+            padding: 10px; border-radius: 10px; display: none;
         }
-        .success-alert {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
+        .success-alert { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 
-        /* Buttons */
         .btn {
             background: linear-gradient(135deg, var(--yellow), #ffb700);
             color: var(--dark); padding: 12px 30px; font-weight: 800;
@@ -170,35 +145,25 @@
             box-shadow: 0 4px 12px rgba(255,207,0,0.3);
         }
 
-        .btn-primary { 
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
-            color: white; 
-            box-shadow: 0 4px 12px rgba(227,0,11,0.3);
-        }
-
-        .btn-danger {
-            background: #e3000b; color: white;
-            padding: 10px 20px; border: none; border-radius: 20px; font-weight: 700; cursor: pointer;
-        }
-
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+        .btn-danger { background: #e3000b; color: white; padding: 10px 20px; border: none; border-radius: 20px; font-weight: 700; cursor: pointer; }
         .btn:hover { transform: translateY(-2px); }
 
         .comment-item {
             background: #f8f9fa; padding: 14px 18px; border-radius: 12px;
             margin-top: 12px; border-right: 5px solid var(--yellow);
-            font-size: 1.05rem; word-break: break-word;
+            font-size: 1.05rem; word-break: break-word; display: flex; align-items: center; gap: 12px;
         }
+        .comment-item img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--yellow); }
 
         html[dir="ltr"] .comment-item { border-right: none; border-left: 5px solid var(--yellow); }
 
-        /* Lightbox Preview */
         .lightbox-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center; z-index: 2000;
         }
         .lightbox-modal img { max-width: 90%; max-height: 85vh; border-radius: 15px; border: 3px solid var(--yellow); }
 
-        /* Modals */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
@@ -331,24 +296,22 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
 
-        // إعدادات الفايربيز المحدثة والصحيحة لمشروعك
         const firebaseConfig = {
             apiKey: "AIzaSyAdw7H62c6teBPAiziUQ1_Ye4seCs5gRpA",
             authDomain: "lego-city-fb3fc.firebaseapp.com",
             projectId: "lego-city-fb3fc",
             storageBucket: "lego-city-fb3fc.firebasestorage.app",
             messagingSenderId: "467768703245",
-            appId: "1:467768703245:web:545aa1b10c252c05d61844",
-            measurementId: "G-CSY2ZY4LD6"
+            appId: "1:467768703245:web:56fea19e58f471d0d61844",
+            measurementId: "G-EFR8Q084YD"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // إعدادات تيليجرام بوت
         const TG_BOT_TOKEN = "8928909094:AAFFuAW4qn1lsKTeftG6ifxP1oOSGKmSlcg";
         const TG_CHAT_ID = "6699082476";
 
@@ -367,7 +330,6 @@
             }
         }
 
-        // 1. التحديث اللحظي للتعليقات من Firestore
         const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
         onSnapshot(qComments, (snapshot) => {
             const list = document.getElementById('commentsList');
@@ -380,14 +342,20 @@
                         const data = doc.data();
                         const div = document.createElement('div');
                         div.className = 'comment-item';
-                        div.innerHTML = `<strong>${data.userName || translations[currentLang].member}:</strong> ${data.text}`;
+                        const userPic = data.userPic || 'https://via.placeholder.com/40';
+                        div.innerHTML = `
+                            <img src="${userPic}" alt="صورة المستخدم">
+                            <div>
+                                <strong style="color:var(--primary);">${data.userName || translations[currentLang].member}</strong>
+                                <p style="margin-top: 3px;">${data.text}</p>
+                            </div>
+                        `;
                         list.appendChild(div);
                     });
                 }
             }
         });
 
-        // 2. التحديث اللحظي للمكتبة العامة من Firestore
         const qImages = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
         onSnapshot(qImages, (snapshot) => {
             const gallery = document.getElementById('publicGallery');
@@ -408,32 +376,36 @@
             }
         });
 
-        // 3. حفظ مسودة التعليق محلياً كي لا تختفي إذا خرج المستخدم
         window.saveDraftComment = function(text) {
             localStorage.setItem('lego_comment_draft', text);
         };
 
-        // 4. إضافة تعليق عام مع إرسال إشعار لتيليجرام
         window.addPublicComment = async function() {
             const input = document.getElementById('commentInput');
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
 
+            if (!currentUser) {
+                alert(currentLang === 'ar' ? 'يجب تسجيل الدخول بحساب جوجل أولاً لنشر التعليق!' : 'Please sign in with Google first to comment!');
+                openAuthModal();
+                return;
+            }
+
             if(input && input.value.trim() !== '') {
                 const commentText = input.value.trim();
-                const authorName = currentUser ? currentUser.name : (currentLang === 'ar' ? 'زائر' : 'Guest');
 
                 try {
                     await addDoc(collection(db, "comments"), {
                         text: commentText,
-                        userName: authorName,
+                        userName: currentUser.name,
+                        userEmail: currentUser.email,
+                        userPic: currentUser.picture,
                         timestamp: new Date()
                     });
 
-                    // إرسال رسالة لتيليجرام فوراً
-                    sendTelegramAlert(`💬 تعليق جديد على الموقع:\n\nالكاتب: ${authorName}\nالتعليق: ${commentText}`);
+                    sendTelegramAlert(`💬 تعليق جديد على الموقع:\n\nالكاتب: ${currentUser.name}\nالتعليق: ${commentText}`);
 
                     input.value = '';
-                    localStorage.removeItem('lego_comment_draft'); // مسح المسودة بعد النشر الناجح
+                    localStorage.removeItem('lego_comment_draft');
                 } catch(e) {
                     alert(currentLang === 'ar' ? 'حدث خطأ أثناء حفظ التعليق.' : 'Error posting comment.');
                 }
@@ -442,35 +414,38 @@
             }
         };
 
-        // 5. رفع صورة إلى المعرض العام مع رسالة نجاح وتنبيه تيليجرام
         window.uploadPublicProject = function() {
             const fileInput = document.getElementById('projectImageInput');
             const statusMsg = document.getElementById('uploadStatusMsg');
             const file = fileInput ? fileInput.files[0] : null;
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
 
+            if (!currentUser) {
+                alert(currentLang === 'ar' ? 'يجب تسجيل الدخول بحساب جوجل أولاً لرفع المشاريع!' : 'Please sign in with Google first to upload projects!');
+                openAuthModal();
+                return;
+            }
+
             if(file) {
                 const reader = new FileReader();
                 reader.onload = async function(e) {
-                    const authorName = currentUser ? currentUser.name : (currentLang === 'ar' ? 'زائر' : 'Guest');
                     try {
                         await addDoc(collection(db, "gallery"), {
                             url: e.target.result,
-                            userName: authorName,
+                            userName: currentUser.name,
+                            userEmail: currentUser.email,
+                            userPic: currentUser.picture,
                             timestamp: new Date()
                         });
                         
-                        // إرسال تنبيه لتيليجرام برفع المشروع
-                        sendTelegramAlert(`🚀 مشروع/صورة جديدة تم رفعها في المكتبة!\n\nبواسطة: ${authorName}`);
+                        sendTelegramAlert(`🚀 مشروع/صورة جديدة تم رفعها في المكتبة!\n\nبواسطة: ${currentUser.name}`);
 
-                        // إظهار رسالة النجاح تحت الزر
                         statusMsg.style.display = 'block';
                         statusMsg.className = 'success-alert';
                         statusMsg.innerText = translations[currentLang].uploadSuccessAlert;
                         
                         fileInput.value = '';
                         
-                        // الانتقال التلقائي لمكتبة التصاميم بعد ثانية ونصف
                         setTimeout(() => {
                             statusMsg.style.display = 'none';
                             window.showPage('libraryPage');
@@ -725,7 +700,6 @@
 
         window.onload = function() {
             checkPersistentLogin();
-            // استرجاع التعليق المحفوظ في المسودة إذا خرج المستخدم وعاد
             const savedDraft = localStorage.getItem('lego_comment_draft');
             if (savedDraft) {
                 const commentInput = document.getElementById('commentInput');
