@@ -147,6 +147,21 @@
             border-radius: 15px; text-align: center; background: #fffdf0;
         }
 
+        /* Success Message Alert UI */
+        #uploadStatusMsg {
+            margin-top: 15px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+        }
+        .success-alert {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
         /* Buttons */
         .btn {
             background: linear-gradient(135deg, var(--yellow), #ffb700);
@@ -259,6 +274,7 @@
             <div class="upload-box">
                 <input type="file" id="projectImageInput" accept="image/*"><br><br>
                 <button class="btn btn-primary" onclick="uploadPublicProject()" id="sendBtn">إرسال المشروع 🔥</button>
+                <div id="uploadStatusMsg"></div>
             </div>
         </section>
     </div>
@@ -277,7 +293,7 @@
         <section class="section-box">
             <h2 id="commentsTitle">مجتمع الأعضاء والتعليقات العامة 💬</h2>
             <p id="commentsDesc" style="color:#666; margin-bottom: 15px;">اكتب تعليقك هنا ليراه جميع زوار الموقع وتناقش مع المبدعين:</p>
-            <textarea id="commentInput" placeholder="اكتب تعليقك هنا..." style="width:100%; height:90px; padding:12px; border-radius:12px; border: 2px solid #e0e0e0; font-family: inherit; margin-bottom: 15px;"></textarea>
+            <textarea id="commentInput" placeholder="اكتب تعليقك هنا..." style="width:100%; height:90px; padding:12px; border-radius:12px; border: 2px solid #e0e0e0; font-family: inherit; margin-bottom: 15px;" oninput="saveDraftComment(this.value)"></textarea>
             <button class="btn btn-primary" onclick="addPublicComment()" id="submitCommentBtn">نشر التعليق 🚀</button>
 
             <div id="commentsList" style="margin-top: 25px;">
@@ -318,18 +334,38 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // إعدادات الفايربيز المحدثة والصحيحة لمشروعك
         const firebaseConfig = {
             apiKey: "AIzaSyAdw7H62c6teBPAiziUQ1_Ye4seCs5gRpA",
             authDomain: "lego-city-fb3fc.firebaseapp.com",
             projectId: "lego-city-fb3fc",
             storageBucket: "lego-city-fb3fc.firebasestorage.app",
             messagingSenderId: "467768703245",
-            appId: "1:467768703245:web:56fea19e58f471d0d61844",
-            measurementId: "G-EFR8Q084YD"
+            appId: "1:467768703245:web:545aa1b10c252c05d61844",
+            measurementId: "G-CSY2ZY4LD6"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        // إعدادات تيليجرام بوت
+        const TG_BOT_TOKEN = "8928909094:AAFFuAW4qn1lsKTeftG6ifxP1oOSGKmSlcg";
+        const TG_CHAT_ID = "6699082476";
+
+        async function sendTelegramAlert(textMsg) {
+            try {
+                await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TG_CHAT_ID,
+                        text: textMsg
+                    })
+                });
+            } catch (err) {
+                console.error("فشل إرسال التنبيه لتيليجرام", err);
+            }
+        }
 
         // 1. التحديث اللحظي للتعليقات من Firestore
         const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
@@ -372,19 +408,32 @@
             }
         });
 
-        // 3. إضافة تعليق عام
+        // 3. حفظ مسودة التعليق محلياً كي لا تختفي إذا خرج المستخدم
+        window.saveDraftComment = function(text) {
+            localStorage.setItem('lego_comment_draft', text);
+        };
+
+        // 4. إضافة تعليق عام مع إرسال إشعار لتيليجرام
         window.addPublicComment = async function() {
             const input = document.getElementById('commentInput');
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
 
             if(input && input.value.trim() !== '') {
+                const commentText = input.value.trim();
+                const authorName = currentUser ? currentUser.name : (currentLang === 'ar' ? 'زائر' : 'Guest');
+
                 try {
                     await addDoc(collection(db, "comments"), {
-                        text: input.value.trim(),
-                        userName: currentUser ? currentUser.name : (currentLang === 'ar' ? 'زائر' : 'Guest'),
+                        text: commentText,
+                        userName: authorName,
                         timestamp: new Date()
                     });
+
+                    // إرسال رسالة لتيليجرام فوراً
+                    sendTelegramAlert(`💬 تعليق جديد على الموقع:\n\nالكاتب: ${authorName}\nالتعليق: ${commentText}`);
+
                     input.value = '';
+                    localStorage.removeItem('lego_comment_draft'); // مسح المسودة بعد النشر الناجح
                 } catch(e) {
                     alert(currentLang === 'ar' ? 'حدث خطأ أثناء حفظ التعليق.' : 'Error posting comment.');
                 }
@@ -393,24 +442,40 @@
             }
         };
 
-        // 4. رفع صورة إلى المعرض العام
+        // 5. رفع صورة إلى المعرض العام مع رسالة نجاح وتنبيه تيليجرام
         window.uploadPublicProject = function() {
             const fileInput = document.getElementById('projectImageInput');
+            const statusMsg = document.getElementById('uploadStatusMsg');
             const file = fileInput ? fileInput.files[0] : null;
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
 
             if(file) {
                 const reader = new FileReader();
                 reader.onload = async function(e) {
+                    const authorName = currentUser ? currentUser.name : (currentLang === 'ar' ? 'زائر' : 'Guest');
                     try {
                         await addDoc(collection(db, "gallery"), {
                             url: e.target.result,
-                            userName: currentUser ? currentUser.name : (currentLang === 'ar' ? 'زائر' : 'Guest'),
+                            userName: authorName,
                             timestamp: new Date()
                         });
-                        alert(translations[currentLang].uploadSuccessAlert);
+                        
+                        // إرسال تنبيه لتيليجرام برفع المشروع
+                        sendTelegramAlert(`🚀 مشروع/صورة جديدة تم رفعها في المكتبة!\n\nبواسطة: ${authorName}`);
+
+                        // إظهار رسالة النجاح تحت الزر
+                        statusMsg.style.display = 'block';
+                        statusMsg.className = 'success-alert';
+                        statusMsg.innerText = translations[currentLang].uploadSuccessAlert;
+                        
                         fileInput.value = '';
-                        window.showPage('libraryPage');
+                        
+                        // الانتقال التلقائي لمكتبة التصاميم بعد ثانية ونصف
+                        setTimeout(() => {
+                            statusMsg.style.display = 'none';
+                            window.showPage('libraryPage');
+                        }, 1500);
+
                     } catch(err) {
                         alert(currentLang === 'ar' ? 'حدث خطأ أثناء رفع الصورة!' : 'Error uploading image!');
                     }
@@ -424,7 +489,6 @@
 
     <script>
         let currentLang = 'ar';
-        // إضافة Client ID المعرف الخاص بك
         const GOOGLE_CLIENT_ID = "785859751432-8p7jq09n3vqhg8nooj76cne27u2loj77.apps.googleusercontent.com";
 
         const translations = {
@@ -460,7 +524,7 @@
                 submitCommentBtn: "نشر التعليق 🚀",
                 emptyAlert: "يرجى كتابة نص التعليق أولاً!",
                 fileAlert: "يرجى اختيار صورة من جهازك أولاً!",
-                uploadSuccessAlert: "تم نشر تصميمك للجميع بنجاح! 🎉",
+                uploadSuccessAlert: "تم إرسال ونشر المشروع بنجاح! 🎉",
                 loginSuccess: "تم تسجيل الدخول بنجاح! 🚀",
                 noComments: "لا توجد تعليقات بعد. كن أول من يعلق!",
                 member: "عضو",
@@ -498,7 +562,7 @@
                 submitCommentBtn: "Post Comment 🚀",
                 emptyAlert: "Please type a comment first!",
                 fileAlert: "Please choose an image from your device first!",
-                uploadSuccessAlert: "Your design was published successfully! 🎉",
+                uploadSuccessAlert: "Project sent and published successfully! 🎉",
                 loginSuccess: "Successfully signed in! 🚀",
                 noComments: "No comments yet. Be the first to comment!",
                 member: "Member",
@@ -603,6 +667,8 @@
             document.getElementById('sideMenu').style.display = 'none';
         }
 
+        window.showPage = showPage;
+
         function toggleSideMenu() {
             const menu = document.getElementById('sideMenu');
             menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
@@ -612,6 +678,8 @@
             document.getElementById('lightboxImage').src = src;
             document.getElementById('lightboxModal').style.display = 'flex';
         }
+
+        window.zoomImage = zoomImage;
 
         function closeZoom() { document.getElementById('lightboxModal').style.display = 'none'; }
         function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
@@ -657,6 +725,14 @@
 
         window.onload = function() {
             checkPersistentLogin();
+            // استرجاع التعليق المحفوظ في المسودة إذا خرج المستخدم وعاد
+            const savedDraft = localStorage.getItem('lego_comment_draft');
+            if (savedDraft) {
+                const commentInput = document.getElementById('commentInput');
+                if (commentInput) {
+                    commentInput.value = savedDraft;
+                }
+            }
         };
     </script>
 </body>
