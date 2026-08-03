@@ -21,10 +21,11 @@
         * { box-sizing: border-box; transition: all 0.3s ease; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Cairo', sans-serif;
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
             background-color: var(--light-bg);
             color: var(--dark);
             direction: rtl;
+            overflow-x: hidden;
         }
 
         /* Navbar Header */
@@ -41,6 +42,12 @@
             background: #fff; border: 2px solid var(--yellow);
             width: 45px; height: 45px; border-radius: 12px;
             font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
+        .menu-btn:hover {
+            transform: scale(1.08);
+            background: var(--yellow);
         }
 
         .profile-btn {
@@ -48,12 +55,24 @@
             background: linear-gradient(135deg, var(--yellow), var(--orange));
             border: 2px solid #fff; display: flex; align-items: center;
             justify-content: center; cursor: pointer; font-size: 1.3rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden;
+            box-shadow: 0 4px 10px rgba(255,107,0,0.3); overflow: hidden;
         }
 
+        .profile-btn:hover { transform: rotate(15deg) scale(1.1); }
         .profile-btn img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Side Menu Dropdown */
+        .lang-btn {
+            background: linear-gradient(135deg, #2196F3, #1e88e5);
+            color: white; border: none; padding: 8px 18px; border-radius: 20px;
+            cursor: pointer; font-weight: bold; box-shadow: 0 4px 12px rgba(33,150,243,0.3);
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(33,150,243,0.4);
+        }
+
+        /* Side Navigation Dropdown */
         .side-menu {
             display: none; position: fixed; top: 70px; right: 20px;
             background: #ffffff; border-radius: 15px; width: 250px;
@@ -61,17 +80,24 @@
             box-shadow: var(--card-shadow); overflow: hidden;
         }
 
+        html[dir="ltr"] .side-menu { right: auto; left: 20px; }
+
         .side-menu a {
             display: block; padding: 14px 20px; text-decoration: none;
             color: var(--dark); font-weight: 700; border-bottom: 1px solid #f0f0f0;
             cursor: pointer;
         }
 
-        .side-menu a:hover { background-color: var(--yellow); }
+        .side-menu a:hover { background-color: var(--yellow); color: var(--dark); }
 
-        /* Page System Layout */
-        .page { display: none; padding-bottom: 50px; }
+        /* Page Layout */
+        .page { display: none; padding-bottom: 50px; animation: slideUp 0.4s ease-out; }
         .page.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* Hero Banner */
         .hero {
@@ -82,11 +108,12 @@
         }
 
         .hero h1 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 900; }
-        .hero p { font-size: 1.2rem; max-width: 600px; margin: 0 auto; opacity: 0.9; }
+        .hero p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 20px; opacity: 0.9; }
 
+        /* Hero Image Container */
         .hero-image-container { max-width: 800px; margin: -30px auto 40px; padding: 0 20px; }
-        .main-card { cursor: pointer; }
-        .main-card img { width: 100%; border-radius: 20px; border: 5px solid var(--yellow); box-shadow: var(--card-shadow); }
+        .main-card { cursor: pointer; border-radius: 20px; overflow: hidden; }
+        .main-card img { width: 100%; border-radius: 20px; border: 5px solid var(--yellow); box-shadow: var(--card-shadow); display: block; }
 
         /* Galleries Layout */
         .lego-gallery-grid {
@@ -100,8 +127,8 @@
             transition: transform 0.3s;
         }
 
-        .gallery-card:hover { transform: translateY(-5px); }
-        .gallery-card img { width: 100%; height: 200px; object-fit: cover; }
+        .gallery-card:hover { transform: translateY(-5px); border-color: var(--yellow); }
+        .gallery-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
         .gallery-card .card-title { padding: 12px; font-weight: 800; text-align: center; background: #fff; }
 
         /* Boxes & Sections */
@@ -110,7 +137,15 @@
             background: white; border-radius: 20px; box-shadow: var(--card-shadow);
         }
 
-        .section-box h2 { margin-bottom: 15px; color: var(--primary); }
+        .section-box h2 {
+            margin-bottom: 15px; color: var(--primary);
+            border-bottom: 4px solid var(--yellow); display: inline-block; padding-bottom: 5px;
+        }
+
+        .upload-box {
+            border: 3px dashed var(--yellow); padding: 35px;
+            border-radius: 15px; text-align: center; background: #fffdf0;
+        }
 
         /* Buttons */
         .btn {
@@ -127,16 +162,19 @@
         }
 
         .btn-danger {
-            background: #e3000b;
-            color: white;
+            background: #e3000b; color: white;
             padding: 10px 20px; border: none; border-radius: 20px; font-weight: 700; cursor: pointer;
         }
+
+        .btn:hover { transform: translateY(-2px); }
 
         .comment-item {
             background: #f8f9fa; padding: 14px 18px; border-radius: 12px;
             margin-top: 12px; border-right: 5px solid var(--yellow);
             font-size: 1.05rem; word-break: break-word;
         }
+
+        html[dir="ltr"] .comment-item { border-right: none; border-left: 5px solid var(--yellow); }
 
         /* Lightbox Preview */
         .lightbox-modal {
@@ -145,67 +183,102 @@
         }
         .lightbox-modal img { max-width: 90%; max-height: 85vh; border-radius: 15px; border: 3px solid var(--yellow); }
 
-        /* Authentication Modal */
+        /* Modals */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            justify-content: center; align-items: center; z-index: 1000;
         }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 420px; width: 90%; border: 4px solid var(--yellow); }
+
+        .social-links { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+        .social-btn { padding: 14px; border-radius: 12px; text-decoration: none; color: white; font-weight: 800; display: block; }
+        .youtube { background: linear-gradient(135deg, #ff0000, #cc0000); }
+        .telegram { background: linear-gradient(135deg, #0088cc, #006699); }
     </style>
 </head>
 <body>
 
     <header class="navbar">
         <div class="nav-icons">
-            <button class="menu-btn" onclick="toggleSideMenu()">☰</button>
-            <div class="profile-btn" id="profileIcon" onclick="openAuthModal()">👤</div>
+            <button class="menu-btn" onclick="toggleSideMenu()" title="القائمة">☰</button>
+            <div class="profile-btn" id="profileIcon" onclick="openAuthModal()" title="تسجيل الدخول">👤</div>
         </div>
-        <h2>Lego City 🧱</h2>
+        <button class="lang-btn" onclick="toggleLanguage()" id="langToggleBtn">English 🌐</button>
     </header>
 
     <nav class="side-menu" id="sideMenu">
-        <a onclick="showPage('homePage')">الصفحة الرئيسية 🏠</a>
-        <a onclick="showPage('sharePage')">شارك مشروعك 🚀</a>
-        <a onclick="showPage('libraryPage')">مكتبة التصاميم العامة 🖼️</a>
-        <a onclick="showPage('commentsPage')">التعليقات والمناقشات 💬</a>
+        <a onclick="showPage('homePage')" id="menuHome">الصفحة الرئيسية 🏠</a>
+        <a onclick="showPage('sharePage')" id="menuShare">شارك مشروعك 🚀</a>
+        <a onclick="showPage('libraryPage')" id="menuLibrary">مكتبة التصاميم العامة 🖼️</a>
+        <a onclick="showPage('commentsPage')" id="menuComments">التعليقات والمناقشات 💬</a>
     </nav>
 
     <div id="homePage" class="page active">
         <section class="hero">
-            <h1>مرحباً بكم في عالم Lego City! 🧱</h1>
-            <p>استكشف الإبداع والابتكار وشاهد مجسمات الليجو الجبارة!</p>
+            <h1 id="title">مرحباً بكم في عالم Lego City! 🧱</h1>
+            <p id="desc">استكشف عالم الإبداع والابتكار! نقدم لك أحدث أفكار وتصاميم ألعاب الليجو ونعلمك البناء والاحتراف خطوة بخطوة.</p>
+            <button class="btn" onclick="openModal()" id="joinBtn">انضم إلينا الآن 🌟</button>
         </section>
+
         <div class="hero-image-container">
             <div class="main-card" onclick="zoomImage('lego.jpg')">
                 <img src="lego.jpg" alt="تصميم ليجو الرئيسي" onerror="this.src='https://via.placeholder.com/800x400?text=Lego+City+Image'">
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <h2 style="color: var(--primary); font-size: 2rem; font-weight: 900;" id="galleryHeaderTitle">معرض تصاميم ومجسمات الليجو 🧱✨</h2>
+            <p style="color: #666; font-size: 1.1rem;" id="galleryHeaderDesc">اضغط على أي صورة للتكبير والعبور لشاشة كاملة</p>
+        </div>
+
+        <div class="lego-gallery-grid">
+            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
+                <img src="https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?q=80&w=800&auto=format&fit=crop" alt="Lego City Center">
+                <div class="card-title">مدينة ليجو متكاملة 🏙️</div>
+            </div>
+            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
+                <img src="https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=800&auto=format&fit=crop" alt="Lego Minifigures">
+                <div class="card-title">شخصيات ومجسمات الليجو 👤</div>
+            </div>
+            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
+                <img src="https://images.unsplash.com/photo-1611605698335-8b1569810432?q=80&w=800&auto=format&fit=crop" alt="Lego Race Car">
+                <div class="card-title">سيارة سباق من الليجو 🏎️</div>
+            </div>
+            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
+                <img src="https://images.unsplash.com/photo-1587654780291-39c9404d746b?q=80&w=800&auto=format&fit=crop" alt="Lego Bricks">
+                <div class="card-title">تشكيلة قطع مكعبات زاهية 🧩</div>
             </div>
         </div>
     </div>
 
     <div id="sharePage" class="page">
         <section class="section-box">
-            <h2>شارك مشروعك مع الجميع 🚀</h2>
-            <p style="margin-bottom: 20px; color: #666;">اختر صورة من جهازك لتظهر لكل زوار الموقع فوراً في المكتبة العامة:</p>
-            <input type="file" id="projectImageInput" accept="image/*" style="margin-bottom: 20px;"><br>
-            <button class="btn btn-primary" onclick="uploadPublicProject()">نشر للجميع 🔥</button>
+            <h2 id="shareTitle">شارك مشروعك 🚀</h2>
+            <p id="shareDesc" style="margin-bottom: 20px; color: #666;">قم برفع صورة تصميمك ليتم نشرها وحفظها لجميع زوار الموقع في المكتبة العامة:</p>
+            <div class="upload-box">
+                <input type="file" id="projectImageInput" accept="image/*"><br><br>
+                <button class="btn btn-primary" onclick="uploadPublicProject()" id="sendBtn">إرسال المشروع 🔥</button>
+            </div>
         </section>
     </div>
 
     <div id="libraryPage" class="page">
         <section class="section-box">
-            <h2>معرض تصاميم الأعضاء 🖼️</h2>
-            <p style="color: #666; margin-bottom: 20px;">جميع التصاميم والصور المرفوعة من قبل أعضاء ورائدي المجتمع:</p>
+            <h2 id="libraryTitle">مكتبة التصاميم العامة 🖼️</h2>
+            <p id="libraryDesc" style="color: #666; margin-bottom: 20px;">جميع التصاميم والصور المرفوعة من قبل أعضاء ورائدي المجتمع:</p>
             <div id="publicGallery" class="lego-gallery-grid">
-                <p style="text-align: center; color: #888;">جاري تحميل التصاميم...</p>
+                <p style="text-align: center; color: #888; grid-column: 1/-1;">جاري تحميل التصاميم...</p>
             </div>
         </section>
     </div>
 
     <div id="commentsPage" class="page">
         <section class="section-box">
-            <h2>مجتمع الأعضاء والتعليقات العامة 💬</h2>
-            <textarea id="commentInput" placeholder="اكتب تعليقك هنا ليراه جميع زوار الموقع..." style="width:100%; height:90px; padding:12px; border-radius:12px; border: 1px solid #ccc; font-family: inherit; margin-bottom: 15px;"></textarea>
-            <button class="btn btn-primary" onclick="addPublicComment()">نشر التعليق 🚀</button>
+            <h2 id="commentsTitle">مجتمع الأعضاء والتعليقات العامة 💬</h2>
+            <p id="commentsDesc" style="color:#666; margin-bottom: 15px;">اكتب تعليقك هنا ليراه جميع زوار الموقع وتناقش مع المبدعين:</p>
+            <textarea id="commentInput" placeholder="اكتب تعليقك هنا..." style="width:100%; height:90px; padding:12px; border-radius:12px; border: 2px solid #e0e0e0; font-family: inherit; margin-bottom: 15px;"></textarea>
+            <button class="btn btn-primary" onclick="addPublicComment()" id="submitCommentBtn">نشر التعليق 🚀</button>
 
             <div id="commentsList" style="margin-top: 25px;">
                 <p style="text-align: center; color: #888;">جاري تحميل التعليقات...</p>
@@ -218,9 +291,30 @@
     </div>
 
     <div class="modal" id="authModal">
-        <div class="modal-content" id="authModalContent">
+        <div class="modal-content" id="authModalContent"></div>
+    </div>
+
+    <div class="modal" id="subscribeModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">انضم إلى قنواتنا الرسمية!</h3>
+            <p id="modalDesc">اشترك لتتابع أحدث شروحات البناء والتصاميم:</p>
+            <div class="social-links">
+                <a href="https://www.youtube.com/@lego-city-woooo" target="_blank" class="social-btn youtube" onclick="enableNextStep()" id="ytBtn">قناة YouTube 🎥</a>
+                <a href="https://t.me/Legocitywooo" target="_blank" class="social-btn telegram" onclick="enableNextStep()" id="tgBtn">قناة Telegram ✈️</a>
             </div>
-    </div><script type="module">
+            <div id="nextStep" style="display: none;">
+                <hr style="margin: 15px 0;">
+                <p id="googleText">سجل دخولك الآن:</p>
+                <div style="display: flex; justify-content: center; margin-top: 10px;">
+                    <div id="subscribeGoogleBtn"></div>
+                </div>
+            </div>
+            <br>
+            <span style="cursor:pointer; color:#888; text-decoration:underline;" onclick="closeModal()" id="closeBtn">إغلاق</span>
+        </div>
+    </div>
+
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -237,48 +331,48 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 1. الاستماع الحي للتعليقات
+        // 1. التحديث اللحظي للتعليقات من Firestore
         const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
         onSnapshot(qComments, (snapshot) => {
             const list = document.getElementById('commentsList');
             if (list) {
                 list.innerHTML = '';
                 if(snapshot.empty) {
-                    list.innerHTML = '<p style="text-align:center; color:#888;">لا توجد تعليقات بعد. كن أول من يعلق!</p>';
+                    list.innerHTML = `<p style="text-align:center; color:#888;">${translations[currentLang].noComments}</p>`;
                 } else {
                     snapshot.forEach((doc) => {
                         const data = doc.data();
                         const div = document.createElement('div');
                         div.className = 'comment-item';
-                        div.innerHTML = `<strong>${data.userName || 'عضو'}:</strong> ${data.text}`;
+                        div.innerHTML = `<strong>${data.userName || translations[currentLang].member}:</strong> ${data.text}`;
                         list.appendChild(div);
                     });
                 }
             }
         });
 
-        // 2. الاستماع الحي للمكتبة العامة
+        // 2. التحديث اللحظي للمكتبة العامة من Firestore
         const qImages = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
         onSnapshot(qImages, (snapshot) => {
             const gallery = document.getElementById('publicGallery');
             if (gallery) {
                 gallery.innerHTML = '';
                 if(snapshot.empty) {
-                    gallery.innerHTML = '<p style="text-align:center; color:#888; grid-column: 1/-1;">لا توجد صور في المكتبة حالياً.</p>';
+                    gallery.innerHTML = `<p style="text-align:center; color:#888; grid-column: 1/-1;">${translations[currentLang].emptyLibraryMsg}</p>`;
                 } else {
                     snapshot.forEach((doc) => {
                         const data = doc.data();
                         const card = document.createElement('div');
                         card.className = 'gallery-card';
                         card.onclick = () => window.zoomImage(data.url);
-                        card.innerHTML = `<img src="${data.url}" alt="تصميم مشترك"><div class="card-title">تصميم بواسطة ${data.userName || 'عضو'} 🧩</div>`;
+                        card.innerHTML = `<img src="${data.url}" alt="تصميم"><div class="card-title">${translations[currentLang].byUser} ${data.userName || translations[currentLang].member} 🧩</div>`;
                         gallery.appendChild(card);
                     });
                 }
             }
         });
 
-        // 3. إضافة تعليق
+        // 3. إضافة تعليق عام
         window.addPublicComment = async function() {
             const input = document.getElementById('commentInput');
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
@@ -287,19 +381,19 @@
                 try {
                     await addDoc(collection(db, "comments"), {
                         text: input.value.trim(),
-                        userName: currentUser ? currentUser.name : 'زائر',
+                        userName: currentUser ? currentUser.name : (currentLang === 'ar' ? 'زائر' : 'Guest'),
                         timestamp: new Date()
                     });
                     input.value = '';
                 } catch(e) {
-                    alert('حدث خطأ أثناء حفظ التعليق.');
+                    alert(currentLang === 'ar' ? 'حدث خطأ أثناء حفظ التعليق.' : 'Error posting comment.');
                 }
             } else {
-                alert('يرجى كتابة نص التعليق أولاً!');
+                alert(translations[currentLang].emptyAlert);
             }
         };
 
-        // 4. رفع صورة
+        // 4. رفع صورة إلى المعرض العام
         window.uploadPublicProject = function() {
             const fileInput = document.getElementById('projectImageInput');
             const file = fileInput ? fileInput.files[0] : null;
@@ -311,24 +405,107 @@
                     try {
                         await addDoc(collection(db, "gallery"), {
                             url: e.target.result,
-                            userName: currentUser ? currentUser.name : 'زائر',
+                            userName: currentUser ? currentUser.name : (currentLang === 'ar' ? 'زائر' : 'Guest'),
                             timestamp: new Date()
                         });
-                        alert('تم نشر تصميمك للجميع بنجاح! 🎉');
+                        alert(translations[currentLang].uploadSuccessAlert);
                         fileInput.value = '';
                         window.showPage('libraryPage');
                     } catch(err) {
-                        alert('حدث خطأ أثناء رفع الصورة!');
+                        alert(currentLang === 'ar' ? 'حدث خطأ أثناء رفع الصورة!' : 'Error uploading image!');
                     }
                 };
                 reader.readAsDataURL(file);
             } else {
-                alert('اختر صورة من جهازك أولاً!');
+                alert(translations[currentLang].fileAlert);
             }
         };
     </script>
 
     <script>
+        let currentLang = 'ar';
+        // إضافة Client ID المعرف الخاص بك
+        const GOOGLE_CLIENT_ID = "785859751432-8p7jq09n3vqhg8nooj76cne27u2loj77.apps.googleusercontent.com";
+
+        const translations = {
+            ar: {
+                langBtn: "English 🌐",
+                menuHome: "الصفحة الرئيسية 🏠",
+                menuShare: "شارك مشروعك 🚀",
+                menuLibrary: "مكتبة التصاميم العامة 🖼️",
+                menuComments: "التعليقات والمناقشات 💬",
+                title: "مرحباً بكم في عالم Lego City! 🧱",
+                desc: "استكشف عالم الإبداع والابتكار! نقدم لك أحدث أفكار وتصاميم ألعاب الليجو ونعلمك البناء والاحتراف خطوة بخطوة.",
+                joinBtn: "انضم إلينا الآن 🌟",
+                galleryHeaderTitle: "معرض تصاميم ومجسمات الليجو 🧱✨",
+                galleryHeaderDesc: "اضغط على أي صورة للتكبير والعبور لشاشة كاملة",
+                shareTitle: "شارك مشروعك 🚀",
+                shareDesc: "قم برفع صورة تصميمك ليتم نشرها وحفظها لجميع زوار الموقع في المكتبة العامة:",
+                sendBtn: "إرسال المشروع 🔥",
+                libraryTitle: "مكتبة التصاميم العامة 🖼️",
+                libraryDesc: "جميع التصاميم والصور المرفوعة من قبل أعضاء ورائدي المجتمع:",
+                emptyLibraryMsg: "لا توجد صور في المكتبة حالياً.",
+                authTitle: "تسجيل الدخول",
+                authDesc: "انضم وسجل دخولك عبر حساب جوجل:",
+                closeAuthBtn: "إغلاق",
+                modalTitle: "انضم إلى قنواتنا الرسمية!",
+                modalDesc: "اشترك لتتابع أحدث شروحات البناء والتصاميم:",
+                ytBtn: "قناة YouTube 🎥",
+                tgBtn: "قناة Telegram ✈️",
+                googleText: "سجل دخولك الآن:",
+                closeBtn: "إغلاق",
+                commentsTitle: "مجتمع الأعضاء والتعليقات العامة 💬",
+                commentsDesc: "اكتب تعليقك هنا ليراه جميع زوار الموقع وتناقش مع المبدعين:",
+                commentPlaceholder: "اكتب تعليقك هنا...",
+                submitCommentBtn: "نشر التعليق 🚀",
+                emptyAlert: "يرجى كتابة نص التعليق أولاً!",
+                fileAlert: "يرجى اختيار صورة من جهازك أولاً!",
+                uploadSuccessAlert: "تم نشر تصميمك للجميع بنجاح! 🎉",
+                loginSuccess: "تم تسجيل الدخول بنجاح! 🚀",
+                noComments: "لا توجد تعليقات بعد. كن أول من يعلق!",
+                member: "عضو",
+                byUser: "تصميم بواسطة"
+            },
+            en: {
+                langBtn: "العربية 🌐",
+                menuHome: "Home Page 🏠",
+                menuShare: "Share Your Project 🚀",
+                menuLibrary: "Public Designs Library 🖼️",
+                menuComments: "Comments & Discussions 💬",
+                title: "Welcome to Lego City! 🧱",
+                desc: "Explore creativity and innovation! We present top Lego build designs and step-by-step tutorials.",
+                joinBtn: "Join Us Now 🌟",
+                galleryHeaderTitle: "Lego Builds & Designs Showcase 🧱✨",
+                galleryHeaderDesc: "Click on any image to zoom into full screen",
+                shareTitle: "Share Your Project 🚀",
+                shareDesc: "Upload your creation image to share it publicly in the designs library:",
+                sendBtn: "Send Project 🔥",
+                libraryTitle: "Public Designs Library 🖼️",
+                libraryDesc: "All community designs and creations uploaded by members:",
+                emptyLibraryMsg: "No designs uploaded yet in the library.",
+                authTitle: "Sign In",
+                authDesc: "Sign in using your Google account:",
+                closeAuthBtn: "Close",
+                modalTitle: "Join Our Official Channels!",
+                modalDesc: "Subscribe to stay updated with Lego building techniques:",
+                ytBtn: "YouTube Channel 🎥",
+                tgBtn: "Telegram Channel ✈️",
+                googleText: "Sign in now:",
+                closeBtn: "Close",
+                commentsTitle: "Community & Public Discussions 💬",
+                commentsDesc: "Write your comment here for all visitors to view and discuss:",
+                commentPlaceholder: "Type your comment here...",
+                submitCommentBtn: "Post Comment 🚀",
+                emptyAlert: "Please type a comment first!",
+                fileAlert: "Please choose an image from your device first!",
+                uploadSuccessAlert: "Your design was published successfully! 🎉",
+                loginSuccess: "Successfully signed in! 🚀",
+                noComments: "No comments yet. Be the first to comment!",
+                member: "Member",
+                byUser: "Designed by"
+            }
+        };
+
         function parseJwt (token) {
             var base64Url = token.split('.')[1];
             var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -359,6 +536,27 @@
             }));
             checkPersistentLogin();
             closeAuthModal();
+            closeModal();
+            alert(translations[currentLang].loginSuccess);
+        }
+
+        function renderGoogleButtons() {
+            if (window.google && google.accounts && google.accounts.id) {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleCredentialResponse
+                });
+
+                const mainBtnContainer = document.getElementById('googleSignInBtn');
+                if (mainBtnContainer) {
+                    google.accounts.id.renderButton(mainBtnContainer, { theme: 'outline', size: 'large', shape: 'pill' });
+                }
+
+                const subBtnContainer = document.getElementById('subscribeGoogleBtn');
+                if (subBtnContainer) {
+                    google.accounts.id.renderButton(subBtnContainer, { theme: 'outline', size: 'large', shape: 'pill' });
+                }
+            }
         }
 
         function logout() {
@@ -375,42 +573,39 @@
                 const user = JSON.parse(savedUser);
                 modalContent.innerHTML = `
                     <img src="${user.picture}" style="width:70px; height:70px; border-radius:50%; margin-bottom:10px;">
-                    <h3>أهلاً بك، ${user.name} 👋</h3>
+                    <h3>${currentLang === 'ar' ? 'أهلاً بك،' : 'Welcome,'} ${user.name} 👋</h3>
                     <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">${user.email}</p>
-                    <button class="btn btn-danger" onclick="logout()">تسجيل الخروج 🚪</button>
+                    <button class="btn btn-danger" onclick="logout()">${currentLang === 'ar' ? 'تسجيل الخروج 🚪' : 'Logout 🚪'}</button>
                     <br><br>
-                    <button class="btn" onclick="closeAuthModal()">إغلاق</button>
+                    <button class="btn" onclick="closeAuthModal()">${translations[currentLang].closeBtn}</button>
                 `;
             } else {
                 modalContent.innerHTML = `
-                    <h3 style="margin-bottom: 20px;">تسجيل الدخول</h3>
-                    <div id="g_id_onload"
-                         data-client_id="785859751432-8p7jq09n3vqhg8nooj76cne27u2loj77.apps.googleusercontent.com"
-                         data-callback="handleCredentialResponse">
-                    </div>
-                    <div class="g_id_signin" data-type="standard"></div>
-                    <br><button class="btn" onclick="closeAuthModal()" style="margin-top: 15px;">إغلاق</button>
+                    <h3 style="margin-bottom: 10px;">${translations[currentLang].authTitle}</h3>
+                    <p style="color:#666; margin-bottom:15px;">${translations[currentLang].authDesc}</p>
+                    <div id="googleSignInBtn" style="display:flex; justify-content:center; margin: 15px 0;"></div>
+                    <button class="btn" onclick="closeAuthModal()" style="margin-top: 10px;">${translations[currentLang].closeAuthBtn}</button>
                 `;
-                if (window.google) {
-                    google.accounts.id.renderButton(
-                        document.querySelector('.g_id_signin'),
-                        { theme: 'outline', size: 'large' }
-                    );
-                }
+                setTimeout(renderGoogleButtons, 100);
             }
             document.getElementById('authModal').style.display = 'flex';
         }
 
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const targetPage = document.getElementById(id);
-            if(targetPage) { targetPage.classList.add('active'); }
+        function openModal() { 
+            document.getElementById('subscribeModal').style.display = 'flex'; 
+            setTimeout(renderGoogleButtons, 100);
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            const targetPage = document.getElementById(pageId);
+            if(targetPage) targetPage.classList.add('active');
             document.getElementById('sideMenu').style.display = 'none';
         }
 
         function toggleSideMenu() {
-            const m = document.getElementById('sideMenu');
-            m.style.display = (m.style.display === 'block') ? 'none' : 'block';
+            const menu = document.getElementById('sideMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
         }
 
         function zoomImage(src) {
@@ -420,9 +615,49 @@
 
         function closeZoom() { document.getElementById('lightboxModal').style.display = 'none'; }
         function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
+        function closeModal() { document.getElementById('subscribeModal').style.display = 'none'; }
+        function enableNextStep() { 
+            document.getElementById('nextStep').style.display = 'block'; 
+            setTimeout(renderGoogleButtons, 100);
+        }
 
-        // التحقق من حالة تسجيل الدخول تلقائياً فور تحميل الصفحة
-        window.onload = checkPersistentLogin;
+        function toggleLanguage() {
+            const html = document.getElementById('htmlTag');
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            html.setAttribute('lang', currentLang);
+            html.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+
+            const t = translations[currentLang];
+            document.getElementById('langToggleBtn').innerText = t.langBtn;
+            document.getElementById('menuHome').innerText = t.menuHome;
+            document.getElementById('menuShare').innerText = t.menuShare;
+            document.getElementById('menuLibrary').innerText = t.menuLibrary;
+            document.getElementById('menuComments').innerText = t.menuComments;
+            document.getElementById('title').innerText = t.title;
+            document.getElementById('desc').innerText = t.desc;
+            document.getElementById('joinBtn').innerText = t.joinBtn;
+            document.getElementById('galleryHeaderTitle').innerText = t.galleryHeaderTitle;
+            document.getElementById('galleryHeaderDesc').innerText = t.galleryHeaderDesc;
+            document.getElementById('shareTitle').innerText = t.shareTitle;
+            document.getElementById('shareDesc').innerText = t.shareDesc;
+            document.getElementById('sendBtn').innerText = t.sendBtn;
+            document.getElementById('libraryTitle').innerText = t.libraryTitle;
+            document.getElementById('libraryDesc').innerText = t.libraryDesc;
+            document.getElementById('modalTitle').innerText = t.modalTitle;
+            document.getElementById('modalDesc').innerText = t.modalDesc;
+            document.getElementById('ytBtn').innerText = t.ytBtn;
+            document.getElementById('tgBtn').innerText = t.tgBtn;
+            document.getElementById('googleText').innerText = t.googleText;
+            document.getElementById('closeBtn').innerText = t.closeBtn;
+            document.getElementById('commentsTitle').innerText = t.commentsTitle;
+            document.getElementById('commentsDesc').innerText = t.commentsDesc;
+            document.getElementById('commentInput').placeholder = t.commentPlaceholder;
+            document.getElementById('submitCommentBtn').innerText = t.submitCommentBtn;
+        }
+
+        window.onload = function() {
+            checkPersistentLogin();
+        };
     </script>
 </body>
 </html>
