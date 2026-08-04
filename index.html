@@ -578,6 +578,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // البريد الإلكتروني للمطور والأونر الرئيسي للموقع
+        const OWNER_EMAIL = "thedevoloper522@gmail.com";
+
         const TG_BOT_TOKEN = "8928909094:AAFFuAW4qn1lsKTeftG6ifxP1oOSGKmSlcg";
         const TG_CHAT_ID = "6699082476";
 
@@ -610,7 +613,9 @@
                     snapshot.forEach((docSnap) => {
                         const data = docSnap.data();
                         const commentId = docSnap.id;
-                        const isOwner = currentUser && (currentUser.email === data.userEmail);
+                        
+                        // التحقق مما إذا كان المستخدم صاحب التعليق أو هو الأونر نفسه
+                        const canDelete = currentUser && (currentUser.email === data.userEmail || currentUser.email === OWNER_EMAIL);
 
                         const div = document.createElement('div');
                         div.className = 'comment-item';
@@ -624,7 +629,7 @@
                                     <p style="margin-top: 3px;">${data.text}</p>
                                 </div>
                             </div>
-                            ${isOwner ? `<button onclick="window.deletePublicComment('${commentId}')" class="delete-btn" title="حذف التعليق">🗑️</button>` : ''}
+                            ${canDelete ? `<button onclick="window.deletePublicComment('${commentId}')" class="delete-btn" title="حذف التعليق">🗑️</button>` : ''}
                         `;
                         list.appendChild(div);
                     });
@@ -648,7 +653,9 @@
                     snapshot.forEach((docSnap) => {
                         const data = docSnap.data();
                         const projectId = docSnap.id;
-                        const isOwner = currentUser && (currentUser.email === data.userEmail);
+
+                        // التحقق مما إذا كان المستخدم صاحب المشروع أو هو الأونر نفسه
+                        const canDelete = currentUser && (currentUser.email === data.userEmail || currentUser.email === OWNER_EMAIL);
                         let imgUrl = data.url || 'https://placehold.co/800x400?text=No+Image';
 
                         const card = document.createElement('div');
@@ -657,7 +664,7 @@
                         card.innerHTML = `
                             <img src="${imgUrl}" alt="تصميم" onclick="window.zoomImage('${imgUrl}')" onerror="this.src='https://placehold.co/800x400?text=Image+Error'">
                             <div class="card-title">تصميم بواسطة ${data.userName || 'عضو'} 🧩</div>
-                            ${isOwner ? `<button onclick="event.stopPropagation(); window.deletePublicProject('${projectId}')" class="delete-btn" style="position: absolute; top: 10px; right: 10px;" title="حذف المشروع">🗑️</button>` : ''}
+                            ${canDelete ? `<button onclick="event.stopPropagation(); window.deletePublicProject('${projectId}')" class="delete-btn" style="position: absolute; top: 10px; right: 10px;" title="حذف المشروع">🗑️</button>` : ''}
                         `;
                         gallery.appendChild(card);
                     });
