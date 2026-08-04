@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" id="htmlTag">
 <head>
@@ -338,14 +337,7 @@
                 commentsTitle: "مجتمع الأعضاء والتعليقات العامة 💬",
                 commentsDesc: "اكتب تعليقك هنا ليراه جميع زوار الموقع وتناقش مع المبدعين:",
                 commentPlaceholder: "اكتب تعليقك هنا...",
-                submitCommentBtn: "نشر التعليق 🚀",
-                emptyAlert: "يرجى كتابة نص التعليق أولاً!",
-                fileAlert: "يرجى اختيار صورة من جهازك أولاً!",
-                uploadSuccessAlert: "تم إرسال ونشر المشروع بنجاح! 🎉",
-                loginSuccess: "تم تسجيل الدخول بنجاح! 🚀",
-                noComments: "لا توجد تعليقات بعد. كن أول من يعلق!",
-                member: "عضو",
-                byUser: "تصميم بواسطة"
+                submitCommentBtn: "نشر التعليق 🚀"
             },
             en: {
                 langBtn: "العربية 🌐",
@@ -376,14 +368,7 @@
                 commentsTitle: "Community & Public Discussions 💬",
                 commentsDesc: "Write your comment here for all visitors to view and discuss:",
                 commentPlaceholder: "Type your comment here...",
-                submitCommentBtn: "Post Comment 🚀",
-                emptyAlert: "Please type a comment first!",
-                fileAlert: "Please choose an image from your device first!",
-                uploadSuccessAlert: "Project sent and published successfully! 🎉",
-                loginSuccess: "Successfully signed in! 🚀",
-                noComments: "No comments yet. Be the first to comment!",
-                member: "Member",
-                byUser: "Designed by"
+                submitCommentBtn: "Post Comment 🚀"
             }
         };
 
@@ -399,7 +384,6 @@
         function checkPersistentLogin() {
             const savedUser = localStorage.getItem('lego_user');
             const profileIcon = document.getElementById('profileIcon');
-            
             if (savedUser) {
                 const user = JSON.parse(savedUser);
                 profileIcon.innerHTML = `<img src="${user.picture}" alt="${user.name}">`;
@@ -418,7 +402,7 @@
             checkPersistentLogin();
             closeAuthModal();
             closeModal();
-            alert(translations[currentLang].loginSuccess);
+            alert('تم تسجيل الدخول بنجاح! 🚀');
             location.reload();
         }
 
@@ -579,9 +563,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // البريد الإلكتروني للآدمين/الأونر الرئيسي للموقع
         const OWNER_EMAIL = "thedevoloper522@gmail.com";
-
         const TG_BOT_TOKEN = "8928909094:AAFFuAW4qn1lsKTeftG6ifxP1oOSGKmSlcg";
         const TG_CHAT_ID = "6699082476";
 
@@ -596,11 +578,11 @@
                     })
                 });
             } catch (err) {
-                console.error("فشل إرسال التنبيه لتيليجرام", err);
+                console.error("Telegram alert failed", err);
             }
         }
 
-        // 1. الاستماع للتعليقات
+        // 1. التعليقات
         const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
         onSnapshot(qComments, (snapshot) => {
             const list = document.getElementById('commentsList');
@@ -635,11 +617,9 @@
                     });
                 }
             }
-        }, (error) => {
-            console.error("خطأ جلب التعليقات:", error);
         });
 
-        // 2. الاستماع للصور والمشاريع
+        // 2. المكتبة العامة
         const qImages = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
         onSnapshot(qImages, (snapshot) => {
             const gallery = document.getElementById('publicGallery');
@@ -669,15 +649,13 @@
                     });
                 }
             }
-        }, (error) => {
-            console.error("خطأ جلب المكتبة:", error);
         });
 
         window.saveDraftComment = function(text) {
             localStorage.setItem('lego_comment_draft', text);
         };
 
-        // 3. نشر تعليق جديد
+        // 3. كتابة تعليق
         window.addPublicComment = async function() {
             const input = document.getElementById('commentInput');
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
@@ -721,41 +699,12 @@
                     await deleteDoc(doc(db, "comments", commentId));
                     alert('تم حذف التعليق بنجاح!');
                 } catch (err) {
-                    console.error("خطأ حذف التعليق:", err);
                     alert('فشل حذف التعليق!');
                 }
             }
         };
 
-        // دالة لضغط حجم الصور آلياً لتخفيف المساحة وتسريع تحميل الموقع
-        function compressImage(file, maxWidth, quality, callback) {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function(event) {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > maxWidth) {
-                        height = Math.round((height * maxWidth) / width);
-                        width = maxWidth;
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
-                    callback(dataUrl);
-                };
-            };
-        }
-
-        // 5. رفع صورة / مشروع مدمجة بدالة ضغط الحجم ومحددة الحجم الأقصى
+        // 5. رفع مشروع (نسخة مستقرة آمنة ومباشرة)
         window.uploadPublicProject = function() {
             const fileInput = document.getElementById('projectImageInput');
             const statusMsg = document.getElementById('uploadStatusMsg');
@@ -769,16 +718,16 @@
             }
 
             if(file) {
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('حجم الصورة كبير جداً! يرجى اختيار صورة أقل من 5 ميجابايت.');
+                if (file.size > 1024 * 1024) {
+                    alert('حجم الصورة كبير! اختر صورة أقل من 1 ميجابايت.');
                     return;
                 }
 
-                // ضغط الصورة بعرض أقصى 800 بكسل وبجودة 70%
-                compressImage(file, 800, 0.7, async function(compressedDataUrl) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
                     try {
                         await addDoc(collection(db, "gallery"), {
-                            url: compressedDataUrl,
+                            url: e.target.result,
                             userName: currentUser.name,
                             userEmail: currentUser.email,
                             userPic: currentUser.picture,
@@ -796,13 +745,13 @@
                         setTimeout(() => {
                             statusMsg.style.display = 'none';
                             window.showPage('libraryPage');
-                        }, 1500);
+                        }, 1200);
 
                     } catch(err) {
-                        console.error("Upload error:", err);
                         alert('حدث خطأ أثناء رفع الصورة!');
                     }
-                });
+                };
+                reader.readAsDataURL(file);
             } else {
                 alert('يرجى اختيار صورة من جهازك أولاً!');
             }
@@ -815,7 +764,6 @@
                     await deleteDoc(doc(db, "gallery", projectId));
                     alert('تم حذف المشروع بنجاح!');
                 } catch (err) {
-                    console.error("خطأ حذف المشروع:", err);
                     alert('فشل حذف المشروع!');
                 }
             }
