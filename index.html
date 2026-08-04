@@ -337,7 +337,14 @@
                 commentsTitle: "مجتمع الأعضاء والتعليقات العامة 💬",
                 commentsDesc: "اكتب تعليقك هنا ليراه جميع زوار الموقع وتناقش مع المبدعين:",
                 commentPlaceholder: "اكتب تعليقك هنا...",
-                submitCommentBtn: "نشر التعليق 🚀"
+                submitCommentBtn: "نشر التعليق 🚀",
+                emptyAlert: "يرجى كتابة نص التعليق أولاً!",
+                fileAlert: "يرجى اختيار صورة من جهازك أولاً!",
+                uploadSuccessAlert: "تم إرسال ونشر المشروع بنجاح! 🎉",
+                loginSuccess: "تم تسجيل الدخول بنجاح! 🚀",
+                noComments: "لا توجد تعليقات بعد. كن أول من يعلق!",
+                member: "عضو",
+                byUser: "تصميم بواسطة"
             },
             en: {
                 langBtn: "العربية 🌐",
@@ -368,7 +375,14 @@
                 commentsTitle: "Community & Public Discussions 💬",
                 commentsDesc: "Write your comment here for all visitors to view and discuss:",
                 commentPlaceholder: "Type your comment here...",
-                submitCommentBtn: "Post Comment 🚀"
+                submitCommentBtn: "Post Comment 🚀",
+                emptyAlert: "Please type a comment first!",
+                fileAlert: "Please choose an image from your device first!",
+                uploadSuccessAlert: "Project sent and published successfully! 🎉",
+                loginSuccess: "Successfully signed in! 🚀",
+                noComments: "No comments yet. Be the first to comment!",
+                member: "Member",
+                byUser: "Designed by"
             }
         };
 
@@ -384,6 +398,7 @@
         function checkPersistentLogin() {
             const savedUser = localStorage.getItem('lego_user');
             const profileIcon = document.getElementById('profileIcon');
+            
             if (savedUser) {
                 const user = JSON.parse(savedUser);
                 profileIcon.innerHTML = `<img src="${user.picture}" alt="${user.name}">`;
@@ -402,7 +417,7 @@
             checkPersistentLogin();
             closeAuthModal();
             closeModal();
-            alert('تم تسجيل الدخول بنجاح! 🚀');
+            alert(translations[currentLang].loginSuccess);
             location.reload();
         }
 
@@ -563,7 +578,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // البريد الإلكتروني للمطور والأونر الرئيسي للموقع
         const OWNER_EMAIL = "thedevoloper522@gmail.com";
+
         const TG_BOT_TOKEN = "8928909094:AAFFuAW4qn1lsKTeftG6ifxP1oOSGKmSlcg";
         const TG_CHAT_ID = "6699082476";
 
@@ -578,11 +595,11 @@
                     })
                 });
             } catch (err) {
-                console.error("Telegram alert failed", err);
+                console.error("فشل إرسال التنبيه لتيليجرام", err);
             }
         }
 
-        // 1. التعليقات
+        // 1. الاستماع للتعليقات
         const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
         onSnapshot(qComments, (snapshot) => {
             const list = document.getElementById('commentsList');
@@ -597,6 +614,7 @@
                         const data = docSnap.data();
                         const commentId = docSnap.id;
                         
+                        // التحقق مما إذا كان المستخدم صاحب التعليق أو هو الأونر نفسه
                         const canDelete = currentUser && (currentUser.email === data.userEmail || currentUser.email === OWNER_EMAIL);
 
                         const div = document.createElement('div');
@@ -617,9 +635,11 @@
                     });
                 }
             }
+        }, (error) => {
+            console.error("خطأ جلب التعليقات:", error);
         });
 
-        // 2. المكتبة العامة
+        // 2. الاستماع للصور والمشاريع
         const qImages = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
         onSnapshot(qImages, (snapshot) => {
             const gallery = document.getElementById('publicGallery');
@@ -634,6 +654,7 @@
                         const data = docSnap.data();
                         const projectId = docSnap.id;
 
+                        // التحقق مما إذا كان المستخدم صاحب المشروع أو هو الأونر نفسه
                         const canDelete = currentUser && (currentUser.email === data.userEmail || currentUser.email === OWNER_EMAIL);
                         let imgUrl = data.url || 'https://placehold.co/800x400?text=No+Image';
 
@@ -649,13 +670,15 @@
                     });
                 }
             }
+        }, (error) => {
+            console.error("خطأ جلب المكتبة:", error);
         });
 
         window.saveDraftComment = function(text) {
             localStorage.setItem('lego_comment_draft', text);
         };
 
-        // 3. كتابة تعليق
+        // 3. نشر تعليق جديد
         window.addPublicComment = async function() {
             const input = document.getElementById('commentInput');
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
@@ -699,12 +722,13 @@
                     await deleteDoc(doc(db, "comments", commentId));
                     alert('تم حذف التعليق بنجاح!');
                 } catch (err) {
+                    console.error("خطأ حذف التعليق:", err);
                     alert('فشل حذف التعليق!');
                 }
             }
         };
 
-        // 5. رفع مشروع (نسخة مستقرة آمنة ومباشرة)
+        // 5. رفع صورة / مشروع
         window.uploadPublicProject = function() {
             const fileInput = document.getElementById('projectImageInput');
             const statusMsg = document.getElementById('uploadStatusMsg');
@@ -719,7 +743,7 @@
 
             if(file) {
                 if (file.size > 1024 * 1024) {
-                    alert('حجم الصورة كبير! اختر صورة أقل من 1 ميجابايت.');
+                    alert('حجم الصورة كبير جداً! يرجى اختيار صورة أقل من 1 ميجابايت.');
                     return;
                 }
 
@@ -745,9 +769,10 @@
                         setTimeout(() => {
                             statusMsg.style.display = 'none';
                             window.showPage('libraryPage');
-                        }, 1200);
+                        }, 1500);
 
                     } catch(err) {
+                        console.error("Upload error:", err);
                         alert('حدث خطأ أثناء رفع الصورة!');
                     }
                 };
@@ -764,6 +789,7 @@
                     await deleteDoc(doc(db, "gallery", projectId));
                     alert('تم حذف المشروع بنجاح!');
                 } catch (err) {
+                    console.error("خطأ حذف المشروع:", err);
                     alert('فشل حذف المشروع!');
                 }
             }
