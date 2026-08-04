@@ -635,14 +635,16 @@
             setTimeout(renderGoogleButtons, 100);
         }
 
+        function enableNextStep() {
+            document.getElementById('nextStep').style.display = 'block';
+        }
+
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             const targetPage = document.getElementById(pageId);
             if(targetPage) targetPage.classList.add('active');
             document.getElementById('sideMenu').style.display = 'none';
         }
-
-        window.showPage = showPage;
 
         function toggleSideMenu() {
             const menu = document.getElementById('sideMenu');
@@ -654,58 +656,48 @@
             document.getElementById('lightboxModal').style.display = 'flex';
         }
 
-        window.zoomImage = zoomImage;
-
         function closeZoom() { document.getElementById('lightboxModal').style.display = 'none'; }
         function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
         function closeModal() { document.getElementById('subscribeModal').style.display = 'none'; }
-        function enableNextStep() { 
-            document.getElementById('nextStep').style.display = 'block'; 
-            setTimeout(renderGoogleButtons, 100);
-        }
 
         function toggleLanguage() {
-            const html = document.getElementById('htmlTag');
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            html.setAttribute('lang', currentLang);
-            html.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            const htmlTag = document.getElementById('htmlTag');
+            htmlTag.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            htmlTag.setAttribute('lang', currentLang);
 
-            const t = translations[currentLang];
-            document.getElementById('langToggleBtn').innerText = t.langBtn;
-            document.getElementById('menuHome').innerText = t.menuHome;
-            document.getElementById('menuShare').innerText = t.menuShare;
-            document.getElementById('menuLibrary').innerText = t.menuLibrary;
-            document.getElementById('menuComments').innerText = t.menuComments;
-            document.getElementById('title').innerText = t.title;
-            document.getElementById('desc').innerText = t.desc;
-            document.getElementById('joinBtn').innerText = t.joinBtn;
-            document.getElementById('galleryHeaderTitle').innerText = t.galleryHeaderTitle;
-            document.getElementById('galleryHeaderDesc').innerText = t.galleryHeaderDesc;
-            document.getElementById('shareTitle').innerText = t.shareTitle;
-            document.getElementById('shareDesc').innerText = t.shareDesc;
-            document.getElementById('sendBtn').innerText = t.sendBtn;
-            document.getElementById('libraryTitle').innerText = t.libraryTitle;
-            document.getElementById('libraryDesc').innerText = t.libraryDesc;
-            document.getElementById('modalTitle').innerText = t.modalTitle;
-            document.getElementById('modalDesc').innerText = t.modalDesc;
-            document.getElementById('ytBtn').innerText = t.ytBtn;
-            document.getElementById('tgBtn').innerText = t.tgBtn;
-            document.getElementById('googleText').innerText = t.googleText;
-            document.getElementById('closeBtn').innerText = t.closeBtn;
-            document.getElementById('commentsTitle').innerText = t.commentsTitle;
-            document.getElementById('commentsDesc').innerText = t.commentsDesc;
-            document.getElementById('commentInput').placeholder = t.commentPlaceholder;
-            document.getElementById('submitCommentBtn').innerText = t.submitCommentBtn;
+            document.getElementById('langToggleBtn').innerText = translations[currentLang].langBtn;
+            document.getElementById('menuHome').innerText = translations[currentLang].menuHome;
+            document.getElementById('menuShare').innerText = translations[currentLang].menuShare;
+            document.getElementById('menuLibrary').innerText = translations[currentLang].menuLibrary;
+            document.getElementById('menuComments').innerText = translations[currentLang].menuComments;
+            document.getElementById('title').innerText = translations[currentLang].title;
+            document.getElementById('desc').innerText = translations[currentLang].desc;
+            document.getElementById('joinBtn').innerText = translations[currentLang].joinBtn;
+            document.getElementById('galleryHeaderTitle').innerText = translations[currentLang].galleryHeaderTitle;
+            document.getElementById('galleryHeaderDesc').innerText = translations[currentLang].galleryHeaderDesc;
+            document.getElementById('shareTitle').innerText = translations[currentLang].shareTitle;
+            document.getElementById('shareDesc').innerText = translations[currentLang].shareDesc;
+            document.getElementById('sendBtn').innerText = translations[currentLang].sendBtn;
+            document.getElementById('libraryTitle').innerText = translations[currentLang].libraryTitle;
+            document.getElementById('libraryDesc').innerText = translations[currentLang].libraryDesc;
+            document.getElementById('modalTitle').innerText = translations[currentLang].modalTitle;
+            document.getElementById('modalDesc').innerText = translations[currentLang].modalDesc;
+            document.getElementById('ytBtn').innerText = translations[currentLang].ytBtn;
+            document.getElementById('tgBtn').innerText = translations[currentLang].tgBtn;
+            document.getElementById('googleText').innerText = translations[currentLang].googleText;
+            document.getElementById('closeBtn').innerText = translations[currentLang].closeBtn;
+            document.getElementById('commentsTitle').innerText = translations[currentLang].commentsTitle;
+            document.getElementById('commentsDesc').innerText = translations[currentLang].commentsDesc;
+            document.getElementById('commentInput').placeholder = translations[currentLang].commentPlaceholder;
+            document.getElementById('submitCommentBtn').innerText = translations[currentLang].submitCommentBtn;
         }
-<!-- هذا تعليق للتجربة -->
+
         window.onload = function() {
             checkPersistentLogin();
-            const savedDraft = localStorage.getItem('lego_comment_draft');
-            if (savedDraft) {
-                const commentInput = document.getElementById('commentInput');
-                if (commentInput) {
-                    commentInput.value = savedDraft;
-                }
+            const draft = localStorage.getItem('lego_comment_draft');
+            if (draft) {
+                document.getElementById('commentInput').value = draft;
             }
         };
     </script>
