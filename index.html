@@ -203,7 +203,7 @@
 
         <div class="hero-image-container">
             <div class="main-card" onclick="zoomImage('lego.jpg')">
-                <img src="lego.jpg" alt="تصميم ليجو الرئيسي" onerror="this.src='https://via.placeholder.com/800x400?text=Lego+City+Image'">
+                <img src="lego.jpg" alt="تصميم ليجو الرئيسي" onerror="this.src='https://placehold.co/800x400?text=Lego+City+Image'">
             </div>
         </div>
 
@@ -294,173 +294,6 @@
             <span style="cursor:pointer; color:#888; text-decoration:underline;" onclick="closeModal()" id="closeBtn">إغلاق</span>
         </div>
     </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAdw7H62c6teBPAiziUQ1_Ye4seCs5gRpA",
-            authDomain: "lego-city-fb3fc.firebaseapp.com",
-            projectId: "lego-city-fb3fc",
-            storageBucket: "lego-city-fb3fc.firebasestorage.app",
-            messagingSenderId: "467768703245",
-            appId: "1:467768703245:web:56fea19e58f471d0d61844",
-            measurementId: "G-EFR8Q084YD"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        const TG_BOT_TOKEN = "8928909094:AAFFuAW4qn1lsKTeftG6ifxP1oOSGKmSlcg";
-        const TG_CHAT_ID = "6699082476";
-
-        async function sendTelegramAlert(textMsg) {
-            try {
-                await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: TG_CHAT_ID,
-                        text: textMsg
-                    })
-                });
-            } catch (err) {
-                console.error("فشل إرسال التنبيه لتيليجرام", err);
-            }
-        }
-
-        const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
-        onSnapshot(qComments, (snapshot) => {
-            const list = document.getElementById('commentsList');
-            if (list) {
-                list.innerHTML = '';
-                if(snapshot.empty) {
-                    list.innerHTML = `<p style="text-align:center; color:#888;">${translations[currentLang].noComments}</p>`;
-                } else {
-                    snapshot.forEach((doc) => {
-                        const data = doc.data();
-                        const div = document.createElement('div');
-                        div.className = 'comment-item';
-                        const userPic = data.userPic || 'https://via.placeholder.com/40';
-                        div.innerHTML = `
-                            <img src="${userPic}" alt="صورة المستخدم">
-                            <div>
-                                <strong style="color:var(--primary);">${data.userName || translations[currentLang].member}</strong>
-                                <p style="margin-top: 3px;">${data.text}</p>
-                            </div>
-                        `;
-                        list.appendChild(div);
-                    });
-                }
-            }
-        });
-
-        const qImages = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
-        onSnapshot(qImages, (snapshot) => {
-            const gallery = document.getElementById('publicGallery');
-            if (gallery) {
-                gallery.innerHTML = '';
-                if(snapshot.empty) {
-                    gallery.innerHTML = `<p style="text-align:center; color:#888; grid-column: 1/-1;">${translations[currentLang].emptyLibraryMsg}</p>`;
-                } else {
-                    snapshot.forEach((doc) => {
-                        const data = doc.data();
-                        const card = document.createElement('div');
-                        card.className = 'gallery-card';
-                        card.onclick = () => window.zoomImage(data.url);
-                        card.innerHTML = `<img src="${data.url}" alt="تصميم"><div class="card-title">${translations[currentLang].byUser} ${data.userName || translations[currentLang].member} 🧩</div>`;
-                        gallery.appendChild(card);
-                    });
-                }
-            }
-        });
-
-        window.saveDraftComment = function(text) {
-            localStorage.setItem('lego_comment_draft', text);
-        };
-
-        window.addPublicComment = async function() {
-            const input = document.getElementById('commentInput');
-            const currentUser = JSON.parse(localStorage.getItem('lego_user'));
-
-            if (!currentUser) {
-                alert(currentLang === 'ar' ? 'يجب تسجيل الدخول بحساب جوجل أولاً لنشر التعليق!' : 'Please sign in with Google first to comment!');
-                openAuthModal();
-                return;
-            }
-
-            if(input && input.value.trim() !== '') {
-                const commentText = input.value.trim();
-
-                try {
-                    await addDoc(collection(db, "comments"), {
-                        text: commentText,
-                        userName: currentUser.name,
-                        userEmail: currentUser.email,
-                        userPic: currentUser.picture,
-                        timestamp: new Date()
-                    });
-
-                    sendTelegramAlert(`💬 تعليق جديد على الموقع:\n\nالكاتب: ${currentUser.name}\nالتعليق: ${commentText}`);
-
-                    input.value = '';
-                    localStorage.removeItem('lego_comment_draft');
-                } catch(e) {
-                    alert(currentLang === 'ar' ? 'حدث خطأ أثناء حفظ التعليق.' : 'Error posting comment.');
-                }
-            } else {
-                alert(translations[currentLang].emptyAlert);
-            }
-        };
-
-        window.uploadPublicProject = function() {
-            const fileInput = document.getElementById('projectImageInput');
-            const statusMsg = document.getElementById('uploadStatusMsg');
-            const file = fileInput ? fileInput.files[0] : null;
-            const currentUser = JSON.parse(localStorage.getItem('lego_user'));
-
-            if (!currentUser) {
-                alert(currentLang === 'ar' ? 'يجب تسجيل الدخول بحساب جوجل أولاً لرفع المشاريع!' : 'Please sign in with Google first to upload projects!');
-                openAuthModal();
-                return;
-            }
-
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    try {
-                        await addDoc(collection(db, "gallery"), {
-                            url: e.target.result,
-                            userName: currentUser.name,
-                            userEmail: currentUser.email,
-                            userPic: currentUser.picture,
-                            timestamp: new Date()
-                        });
-                        
-                        sendTelegramAlert(`🚀 مشروع/صورة جديدة تم رفعها في المكتبة!\n\nبواسطة: ${currentUser.name}`);
-
-                        statusMsg.style.display = 'block';
-                        statusMsg.className = 'success-alert';
-                        statusMsg.innerText = translations[currentLang].uploadSuccessAlert;
-                        
-                        fileInput.value = '';
-                        
-                        setTimeout(() => {
-                            statusMsg.style.display = 'none';
-                            window.showPage('libraryPage');
-                        }, 1500);
-
-                    } catch(err) {
-                        alert(currentLang === 'ar' ? 'حدث خطأ أثناء رفع الصورة!' : 'Error uploading image!');
-                    }
-                };
-                reader.readAsDataURL(file);
-            } else {
-                alert(translations[currentLang].fileAlert);
-            }
-        };
-    </script>
 
     <script>
         let currentLang = 'ar';
@@ -635,10 +468,6 @@
             setTimeout(renderGoogleButtons, 100);
         }
 
-        function enableNextStep() {
-            document.getElementById('nextStep').style.display = 'block';
-        }
-
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             const targetPage = document.getElementById(pageId);
@@ -659,45 +488,238 @@
         function closeZoom() { document.getElementById('lightboxModal').style.display = 'none'; }
         function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
         function closeModal() { document.getElementById('subscribeModal').style.display = 'none'; }
+        function enableNextStep() { 
+            document.getElementById('nextStep').style.display = 'block'; 
+            setTimeout(renderGoogleButtons, 100);
+        }
 
         function toggleLanguage() {
+            const html = document.getElementById('htmlTag');
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            const htmlTag = document.getElementById('htmlTag');
-            htmlTag.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
-            htmlTag.setAttribute('lang', currentLang);
+            html.setAttribute('lang', currentLang);
+            html.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
 
-            document.getElementById('langToggleBtn').innerText = translations[currentLang].langBtn;
-            document.getElementById('menuHome').innerText = translations[currentLang].menuHome;
-            document.getElementById('menuShare').innerText = translations[currentLang].menuShare;
-            document.getElementById('menuLibrary').innerText = translations[currentLang].menuLibrary;
-            document.getElementById('menuComments').innerText = translations[currentLang].menuComments;
-            document.getElementById('title').innerText = translations[currentLang].title;
-            document.getElementById('desc').innerText = translations[currentLang].desc;
-            document.getElementById('joinBtn').innerText = translations[currentLang].joinBtn;
-            document.getElementById('galleryHeaderTitle').innerText = translations[currentLang].galleryHeaderTitle;
-            document.getElementById('galleryHeaderDesc').innerText = translations[currentLang].galleryHeaderDesc;
-            document.getElementById('shareTitle').innerText = translations[currentLang].shareTitle;
-            document.getElementById('shareDesc').innerText = translations[currentLang].shareDesc;
-            document.getElementById('sendBtn').innerText = translations[currentLang].sendBtn;
-            document.getElementById('libraryTitle').innerText = translations[currentLang].libraryTitle;
-            document.getElementById('libraryDesc').innerText = translations[currentLang].libraryDesc;
-            document.getElementById('modalTitle').innerText = translations[currentLang].modalTitle;
-            document.getElementById('modalDesc').innerText = translations[currentLang].modalDesc;
-            document.getElementById('ytBtn').innerText = translations[currentLang].ytBtn;
-            document.getElementById('tgBtn').innerText = translations[currentLang].tgBtn;
-            document.getElementById('googleText').innerText = translations[currentLang].googleText;
-            document.getElementById('closeBtn').innerText = translations[currentLang].closeBtn;
-            document.getElementById('commentsTitle').innerText = translations[currentLang].commentsTitle;
-            document.getElementById('commentsDesc').innerText = translations[currentLang].commentsDesc;
-            document.getElementById('commentInput').placeholder = translations[currentLang].commentPlaceholder;
-            document.getElementById('submitCommentBtn').innerText = translations[currentLang].submitCommentBtn;
+            const t = translations[currentLang];
+            document.getElementById('langToggleBtn').innerText = t.langBtn;
+            document.getElementById('menuHome').innerText = t.menuHome;
+            document.getElementById('menuShare').innerText = t.menuShare;
+            document.getElementById('menuLibrary').innerText = t.menuLibrary;
+            document.getElementById('menuComments').innerText = t.menuComments;
+            document.getElementById('title').innerText = t.title;
+            document.getElementById('desc').innerText = t.desc;
+            document.getElementById('joinBtn').innerText = t.joinBtn;
+            document.getElementById('galleryHeaderTitle').innerText = t.galleryHeaderTitle;
+            document.getElementById('galleryHeaderDesc').innerText = t.galleryHeaderDesc;
+            document.getElementById('shareTitle').innerText = t.shareTitle;
+            document.getElementById('shareDesc').innerText = t.shareDesc;
+            document.getElementById('sendBtn').innerText = t.sendBtn;
+            document.getElementById('libraryTitle').innerText = t.libraryTitle;
+            document.getElementById('libraryDesc').innerText = t.libraryDesc;
+            document.getElementById('modalTitle').innerText = t.modalTitle;
+            document.getElementById('modalDesc').innerText = t.modalDesc;
+            document.getElementById('ytBtn').innerText = t.ytBtn;
+            document.getElementById('tgBtn').innerText = t.tgBtn;
+            document.getElementById('googleText').innerText = t.googleText;
+            document.getElementById('closeBtn').innerText = t.closeBtn;
+            document.getElementById('commentsTitle').innerText = t.commentsTitle;
+            document.getElementById('commentsDesc').innerText = t.commentsDesc;
+            document.getElementById('commentInput').placeholder = t.commentPlaceholder;
+            document.getElementById('submitCommentBtn').innerText = t.submitCommentBtn;
         }
+
+        // جعل الدوال في نطاق Window العام لتعمل مع onClick بالـ HTML
+        window.showPage = showPage;
+        window.zoomImage = zoomImage;
+        window.toggleSideMenu = toggleSideMenu;
+        window.openAuthModal = openAuthModal;
+        window.closeAuthModal = closeAuthModal;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.closeZoom = closeZoom;
+        window.enableNextStep = enableNextStep;
+        window.toggleLanguage = toggleLanguage;
+        window.logout = logout;
 
         window.onload = function() {
             checkPersistentLogin();
-            const draft = localStorage.getItem('lego_comment_draft');
-            if (draft) {
-                document.getElementById('commentInput').value = draft;
+            const savedDraft = localStorage.getItem('lego_comment_draft');
+            if (savedDraft) {
+                const commentInput = document.getElementById('commentInput');
+                if (commentInput) {
+                    commentInput.value = savedDraft;
+                }
+            }
+        };
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdw7H62c6teBPAiziUQ1_Ye4seCs5gRpA",
+            authDomain: "lego-city-fb3fc.firebaseapp.com",
+            projectId: "lego-city-fb3fc",
+            storageBucket: "lego-city-fb3fc.firebasestorage.app",
+            messagingSenderId: "467768703245",
+            appId: "1:467768703245:web:56fea19e58f471d0d61844",
+            measurementId: "G-EFR8Q084YD"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const TG_BOT_TOKEN = "8928909094:AAFFuAW4qn1lsKTeftG6ifxP1oOSGKmSlcg";
+        const TG_CHAT_ID = "6699082476";
+
+        async function sendTelegramAlert(textMsg) {
+            try {
+                await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TG_CHAT_ID,
+                        text: textMsg
+                    })
+                });
+            } catch (err) {
+                console.error("فشل إرسال التنبيه لتيليجرام", err);
+            }
+        }
+
+        const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
+        onSnapshot(qComments, (snapshot) => {
+            const list = document.getElementById('commentsList');
+            if (list) {
+                list.innerHTML = '';
+                if(snapshot.empty) {
+                    list.innerHTML = `<p style="text-align:center; color:#888;">${translations[currentLang].noComments}</p>`;
+                } else {
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const div = document.createElement('div');
+                        div.className = 'comment-item';
+                        const userPic = data.userPic || 'https://placehold.co/40x40?text=U';
+                        div.innerHTML = `
+                            <img src="${userPic}" alt="صورة المستخدم" onerror="this.src='https://placehold.co/40x40?text=U'">
+                            <div>
+                                <strong style="color:var(--primary);">${data.userName || translations[currentLang].member}</strong>
+                                <p style="margin-top: 3px;">${data.text}</p>
+                            </div>
+                        `;
+                        list.appendChild(div);
+                    });
+                }
+            }
+        });
+
+        const qImages = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
+        onSnapshot(qImages, (snapshot) => {
+            const gallery = document.getElementById('publicGallery');
+            if (gallery) {
+                gallery.innerHTML = '';
+                if(snapshot.empty) {
+                    gallery.innerHTML = `<p style="text-align:center; color:#888; grid-column: 1/-1;">${translations[currentLang].emptyLibraryMsg}</p>`;
+                } else {
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        let imgUrl = data.url || 'https://placehold.co/800x400?text=No+Image';
+                        if (imgUrl.includes("via.placeholder.com")) {
+                            imgUrl = imgUrl.replace("via.placeholder.com", "placehold.co");
+                        }
+
+                        const card = document.createElement('div');
+                        card.className = 'gallery-card';
+                        card.onclick = () => window.zoomImage(imgUrl);
+                        card.innerHTML = `<img src="${imgUrl}" alt="تصميم" onerror="this.src='https://placehold.co/800x400?text=Image+Error'"><div class="card-title">${translations[currentLang].byUser} ${data.userName || translations[currentLang].member} 🧩</div>`;
+                        gallery.appendChild(card);
+                    });
+                }
+            }
+        });
+
+        window.saveDraftComment = function(text) {
+            localStorage.setItem('lego_comment_draft', text);
+        };
+
+        window.addPublicComment = async function() {
+            const input = document.getElementById('commentInput');
+            const currentUser = JSON.parse(localStorage.getItem('lego_user'));
+
+            if (!currentUser) {
+                alert(currentLang === 'ar' ? 'يجب تسجيل الدخول بحساب جوجل أولاً لنشر التعليق!' : 'Please sign in with Google first to comment!');
+                window.openAuthModal();
+                return;
+            }
+
+            if(input && input.value.trim() !== '') {
+                const commentText = input.value.trim();
+
+                try {
+                    await addDoc(collection(db, "comments"), {
+                        text: commentText,
+                        userName: currentUser.name,
+                        userEmail: currentUser.email,
+                        userPic: currentUser.picture,
+                        timestamp: new Date()
+                    });
+
+                    sendTelegramAlert(`💬 تعليق جديد على الموقع:\n\nالكاتب: ${currentUser.name}\nالتعليق: ${commentText}`);
+
+                    input.value = '';
+                    localStorage.removeItem('lego_comment_draft');
+                } catch(e) {
+                    alert(currentLang === 'ar' ? 'حدث خطأ أثناء حفظ التعليق.' : 'Error posting comment.');
+                }
+            } else {
+                alert(translations[currentLang].emptyAlert);
+            }
+        };
+
+        window.uploadPublicProject = function() {
+            const fileInput = document.getElementById('projectImageInput');
+            const statusMsg = document.getElementById('uploadStatusMsg');
+            const file = fileInput ? fileInput.files[0] : null;
+            const currentUser = JSON.parse(localStorage.getItem('lego_user'));
+
+            if (!currentUser) {
+                alert(currentLang === 'ar' ? 'يجب تسجيل الدخول بحساب جوجل أولاً لرفع المشاريع!' : 'Please sign in with Google first to upload projects!');
+                window.openAuthModal();
+                return;
+            }
+
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        await addDoc(collection(db, "gallery"), {
+                            url: e.target.result,
+                            userName: currentUser.name,
+                            userEmail: currentUser.email,
+                            userPic: currentUser.picture,
+                            timestamp: new Date()
+                        });
+                        
+                        sendTelegramAlert(`🚀 مشروع/صورة جديدة تم رفعها في المكتبة!\n\nبواسطة: ${currentUser.name}`);
+
+                        statusMsg.style.display = 'block';
+                        statusMsg.className = 'success-alert';
+                        statusMsg.innerText = translations[currentLang].uploadSuccessAlert;
+                        
+                        fileInput.value = '';
+                        
+                        setTimeout(() => {
+                            statusMsg.style.display = 'none';
+                            window.showPage('libraryPage');
+                        }, 1500);
+
+                    } catch(err) {
+                        alert(currentLang === 'ar' ? 'حدث خطأ أثناء رفع الصورة!' : 'Error uploading image!');
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert(translations[currentLang].fileAlert);
             }
         };
     </script>
