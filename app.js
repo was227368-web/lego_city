@@ -33,7 +33,7 @@
         }
     }
 
-    // 1. الاستماع للتعليقات وعرضها مع خيار الحذف للصاحب
+    // 1. جلب التعليقات وعرضها
     const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
     onSnapshot(qComments, (snapshot) => {
         const list = document.getElementById('commentsList');
@@ -42,7 +42,7 @@
         if (list) {
             list.innerHTML = '';
             if(snapshot.empty) {
-                list.innerHTML = `<p style="text-align:center; color:#888;">${translations[currentLang].noComments}</p>`;
+                list.innerHTML = `<p style="text-align:center; color:#888;">لا توجد تعليقات بعد</p>`;
             } else {
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
@@ -51,20 +51,18 @@
 
                     const div = document.createElement('div');
                     div.className = 'comment-item';
-                    div.style.display = 'flex';
-                    div.style.alignItems = 'center';
-                    div.style.justifyContent = 'space-between';
+                    div.style.cssText = 'display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 8px; border-bottom: 1px solid #eee;';
                     
                     const userPic = data.userPic || 'https://placehold.co/40x40?text=U';
                     div.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <img src="${userPic}" alt="صورة المستخدم" onerror="this.src='https://placehold.co/40x40?text=U'">
+                            <img src="${userPic}" style="width: 35px; height: 35px; border-radius: 50%;" alt="صورة المستخدم" onerror="this.src='https://placehold.co/40x40?text=U'">
                             <div>
-                                <strong style="color:var(--primary);">${data.userName || translations[currentLang].member}</strong>
-                                <p style="margin-top: 3px;">${data.text}</p>
+                                <strong style="color:var(--primary, #007bff); display: block;">${data.userName || 'عضو'}</strong>
+                                <p style="margin: 3px 0 0 0;">${data.text}</p>
                             </div>
                         </div>
-                        ${isOwner ? `<button onclick="window.deletePublicComment('${commentId}')" style="background: transparent; border: none; color: #ff4d4d; cursor: pointer; font-size: 16px; padding: 5px;" title="حذف التعليق">🗑️</button>` : ''}
+                        ${isOwner ? `<button onclick="window.deletePublicComment('${commentId}')" style="background: transparent; border: none; color: #ff4d4d; cursor: pointer; font-size: 18px;" title="حذف التعليق">🗑️</button>` : ''}
                     `;
                     list.appendChild(div);
                 });
@@ -74,7 +72,7 @@
         console.error("خطأ جلب التعليقات:", error);
     });
 
-    // 2. الاستماع لمعرض الصور وعرضه مع خيار الحذف للصاحب
+    // 2. جلب الصور وعرضها
     const qImages = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
     onSnapshot(qImages, (snapshot) => {
         const gallery = document.getElementById('publicGallery');
@@ -83,7 +81,7 @@
         if (gallery) {
             gallery.innerHTML = '';
             if(snapshot.empty) {
-                gallery.innerHTML = `<p style="text-align:center; color:#888; grid-column: 1/-1;">${translations[currentLang].emptyLibraryMsg}</p>`;
+                gallery.innerHTML = `<p style="text-align:center; color:#888; grid-column: 1/-1;">المكتبة فارغة حالياً</p>`;
             } else {
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
@@ -96,9 +94,9 @@
                     card.style.position = 'relative';
 
                     card.innerHTML = `
-                        <img src="${imgUrl}" alt="تصميم" onclick="window.zoomImage('${imgUrl}')" onerror="this.src='https://placehold.co/800x400?text=Image+Error'">
-                        <div class="card-title">${translations[currentLang].byUser} ${data.userName || translations[currentLang].member} 🧩</div>
-                        ${isOwner ? `<button onclick="event.stopPropagation(); window.deletePublicProject('${projectId}')" style="position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;" title="حذف المشروع">🗑️</button>` : ''}
+                        <img src="${imgUrl}" alt="تصميم" onclick="if(window.zoomImage) window.zoomImage('${imgUrl}')" onerror="this.src='https://placehold.co/800x400?text=Image+Error'" style="width:100%; border-radius:8px;">
+                        <div class="card-title" style="padding: 5px;">بواسطة ${data.userName || 'عضو'} 🧩</div>
+                        ${isOwner ? `<button onclick="event.stopPropagation(); window.deletePublicProject('${projectId}')" style="position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.85); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 14px;" title="حذف المشروع">🗑️</button>` : ''}
                     `;
                     gallery.appendChild(card);
                 });
@@ -112,14 +110,14 @@
         localStorage.setItem('lego_comment_draft', text);
     };
 
-    // 3. نشر التعليق على الفايربيس
+    // 3. إضافة تعليق
     window.addPublicComment = async function() {
         const input = document.getElementById('commentInput');
         const currentUser = JSON.parse(localStorage.getItem('lego_user'));
 
         if (!currentUser) {
-            alert(currentLang === 'ar' ? 'يجب تسجيل الدخول بحساب جوجل أولاً لنشر التعليق!' : 'Please sign in with Google first to comment!');
-            window.openAuthModal();
+            alert('يجب تسجيل الدخول بحساب جوجل أولاً لنشر التعليق!');
+            if(window.openAuthModal) window.openAuthModal();
             return;
         }
 
@@ -135,35 +133,34 @@
                     timestamp: new Date()
                 });
 
-                sendTelegramAlert(`💬 تعليق جديد على الموقع:\n\nالكاتب: ${currentUser.name}\nالتعليق: ${commentText}`);
+                sendTelegramAlert(`💬 تعليق جديد:\nالكاتب: ${currentUser.name}\nالتعليق: ${commentText}`);
 
                 input.value = '';
                 localStorage.removeItem('lego_comment_draft');
-                alert(currentLang === 'ar' ? 'تم نشر التعليق بنجاح وحفظه!' : 'Comment posted successfully!');
+                alert('تم نشر التعليق بنجاح!');
             } catch(e) {
                 console.error("Firebase Error:", e);
-                alert(currentLang === 'ar' ? 'حدث خطأ في قواعد الحماية (Rules) بالفايربيس!' : 'Firebase Security Rules Error!');
+                alert('حدث خطأ في قاعدة البيانات!');
             }
         } else {
-            alert(translations[currentLang].emptyAlert);
+            alert('يرجى كتابة تعليق أولاً!');
         }
     };
 
-    // 4. حذف التعليق من الفايربيس
+    // 4. حذف تعليق
     window.deletePublicComment = async function(commentId) {
-        const confirmDelete = confirm(currentLang === 'ar' ? 'هل أنت تأكد من رغبتك في حذف هذا التعليق؟' : 'Are you sure you want to delete this comment?');
-        if (confirmDelete) {
+        if (confirm('هل أنت متأكد من حذف هذا التعليق؟')) {
             try {
                 await deleteDoc(doc(db, "comments", commentId));
-                alert(currentLang === 'ar' ? 'تم حذف التعليق بنجاح!' : 'Comment deleted successfully!');
+                alert('تم حذف التعليق!');
             } catch (err) {
                 console.error("خطأ حذف التعليق:", err);
-                alert(currentLang === 'ar' ? 'فشل حذف التعليق!' : 'Failed to delete comment!');
+                alert('فشل حذف التعليق!');
             }
         }
     };
 
-    // 5. رفع المشاريع مع تقليل حجم الصور
+    // 5. رفع مشروع/صورة
     window.uploadPublicProject = function() {
         const fileInput = document.getElementById('projectImageInput');
         const statusMsg = document.getElementById('uploadStatusMsg');
@@ -171,14 +168,14 @@
         const currentUser = JSON.parse(localStorage.getItem('lego_user'));
 
         if (!currentUser) {
-            alert(currentLang === 'ar' ? 'يجب تسجيل الدخول بحساب جوجل أولاً لرفع المشاريع!' : 'Please sign in with Google first to upload projects!');
-            window.openAuthModal();
+            alert('يجب تسجيل الدخول بحساب جوجل أولاً لرفع المشاريع!');
+            if(window.openAuthModal) window.openAuthModal();
             return;
         }
 
         if(file) {
             if (file.size > 1024 * 1024) {
-                alert(currentLang === 'ar' ? 'حجم الصورة كبير جداً! يرجى اختيار صورة أقل من 1 ميجابايت.' : 'Image size is too large! Please choose an image under 1MB.');
+                alert('حجم الصورة كبير جداً! يرجى اختيار صورة أقل من 1 ميجابايت.');
                 return;
             }
 
@@ -193,40 +190,40 @@
                         timestamp: new Date()
                     });
                     
-                    sendTelegramAlert(`🚀 مشروع/صورة جديدة تم رفعها في المكتبة!\n\nبواسطة: ${currentUser.name}`);
+                    sendTelegramAlert(`🚀 صورة جديدة تم رفعها بواسطة: ${currentUser.name}`);
 
-                    statusMsg.style.display = 'block';
-                    statusMsg.className = 'success-alert';
-                    statusMsg.innerText = translations[currentLang].uploadSuccessAlert;
+                    if(statusMsg) {
+                        statusMsg.style.display = 'block';
+                        statusMsg.innerText = 'تم رفع الصورة بنجاح!';
+                    }
                     
                     fileInput.value = '';
                     
                     setTimeout(() => {
-                        statusMsg.style.display = 'none';
-                        window.showPage('libraryPage');
+                        if(statusMsg) statusMsg.style.display = 'none';
+                        if(window.showPage) window.showPage('libraryPage');
                     }, 1500);
 
                 } catch(err) {
                     console.error("Upload error:", err);
-                    alert(currentLang === 'ar' ? 'حدث خطأ أثناء رفع الصورة! تأكد من قواعد الحماية في الفايربيس.' : 'Error uploading image!');
+                    alert('حدث خطأ أثناء رفع الصورة!');
                 }
             };
             reader.readAsDataURL(file);
         } else {
-            alert(translations[currentLang].fileAlert);
+            alert('يرجى اختيار صورة أولاً!');
         }
     };
 
-    // 6. حذف المشروع/الصورة من الفايربيس
+    // 6. حذف مشروع/صورة
     window.deletePublicProject = async function(projectId) {
-        const confirmDelete = confirm(currentLang === 'ar' ? 'هل أنت تأكد من رغبتك في حذف هذا المشروع؟' : 'Are you sure you want to delete this project?');
-        if (confirmDelete) {
+        if (confirm('هل أنت متأكد من حذف هذا المشروع؟')) {
             try {
                 await deleteDoc(doc(db, "gallery", projectId));
-                alert(currentLang === 'ar' ? 'تم حذف المشروع بنجاح!' : 'Project deleted successfully!');
+                alert('تم حذف المشروع!');
             } catch (err) {
                 console.error("خطأ حذف المشروع:", err);
-                alert(currentLang === 'ar' ? 'فشل حذف المشروع!' : 'Failed to delete project!');
+                alert('فشل حذف المشروع!');
             }
         }
     };
