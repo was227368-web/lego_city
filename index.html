@@ -111,6 +111,7 @@
             background: white; border-radius: 18px; overflow: hidden;
             box-shadow: var(--card-shadow); border: 3px solid #fff; cursor: pointer;
             transition: transform 0.3s; position: relative;
+            display: flex; flex-direction: column; justify-content: space-between;
         }
 
         .gallery-card:hover { transform: translateY(-5px); border-color: var(--yellow); }
@@ -149,6 +150,41 @@
         .btn-danger { background: #e3000b; color: white; padding: 10px 20px; border: none; border-radius: 20px; font-weight: 700; cursor: pointer; }
         .btn:hover { transform: translateY(-2px); }
 
+        /* تصميم زر الـ Like */
+        .like-btn {
+            background: #ffffff;
+            border: 2px solid #e0e0e0;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #555;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .like-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .like-btn.liked {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .card-actions {
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+        }
+
         .comment-item {
             background: #f8f9fa; padding: 14px 18px; border-radius: 12px;
             margin-top: 12px; border-right: 5px solid var(--yellow);
@@ -181,6 +217,7 @@
             background: rgba(227, 0, 11, 0.85); color: white; border: none;
             border-radius: 50%; width: 32px; height: 32px; cursor: pointer;
             font-size: 14px; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
         }
         .delete-btn:hover { background: #e3000b; transform: scale(1.1); }
     </style>
@@ -221,21 +258,33 @@
         </div>
 
         <div class="lego-gallery-grid">
-            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
-                <img src="https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?q=80&w=800&auto=format&fit=crop" alt="Lego City Center">
+            <div class="gallery-card">
+                <img src="https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?q=80&w=800&auto=format&fit=crop" alt="Lego City Center" onclick="zoomImage(this.src)">
                 <div class="card-title">مدينة ليجو متكاملة 🏙️</div>
+                <div class="card-actions">
+                    <button class="like-btn" onclick="toggleLike(this)">❤️ <span class="like-count">12</span></button>
+                </div>
             </div>
-            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
-                <img src="https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=800&auto=format&fit=crop" alt="Lego Minifigures">
+            <div class="gallery-card">
+                <img src="https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=800&auto=format&fit=crop" alt="Lego Minifigures" onclick="zoomImage(this.src)">
                 <div class="card-title">شخصيات ومجسمات الليجو 👤</div>
+                <div class="card-actions">
+                    <button class="like-btn" onclick="toggleLike(this)">❤️ <span class="like-count">8</span></button>
+                </div>
             </div>
-            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
-                <img src="https://images.unsplash.com/photo-1611605698335-8b1569810432?q=80&w=800&auto=format&fit=crop" alt="Lego Race Car">
+            <div class="gallery-card">
+                <img src="https://images.unsplash.com/photo-1611605698335-8b1569810432?q=80&w=800&auto=format&fit=crop" alt="Lego Race Car" onclick="zoomImage(this.src)">
                 <div class="card-title">سيارة سباق من الليجو 🏎️</div>
+                <div class="card-actions">
+                    <button class="like-btn" onclick="toggleLike(this)">❤️ <span class="like-count">15</span></button>
+                </div>
             </div>
-            <div class="gallery-card" onclick="zoomImage(this.querySelector('img').src)">
-                <img src="https://images.unsplash.com/photo-1587654780291-39c9404d746b?q=80&w=800&auto=format&fit=crop" alt="Lego Bricks">
+            <div class="gallery-card">
+                <img src="https://images.unsplash.com/photo-1587654780291-39c9404d746b?q=80&w=800&auto=format&fit=crop" alt="Lego Bricks" onclick="zoomImage(this.src)">
                 <div class="card-title">تشكيلة قطع مكعبات زاهية 🧩</div>
+                <div class="card-actions">
+                    <button class="like-btn" onclick="toggleLike(this)">❤️ <span class="like-count">5</span></button>
+                </div>
             </div>
         </div>
     </div>
@@ -385,6 +434,19 @@
                 byUser: "Designed by"
             }
         };
+
+        // دالة الـ Like البسيطة للواجهة
+        function toggleLike(btn) {
+            const countSpan = btn.querySelector('.like-count');
+            let count = parseInt(countSpan.innerText);
+            if (btn.classList.contains('liked')) {
+                btn.classList.remove('liked');
+                countSpan.innerText = count - 1;
+            } else {
+                btn.classList.add('liked');
+                countSpan.innerText = count + 1;
+            }
+        }
 
         function parseJwt (token) {
             var base64Url = token.split('.')[1];
@@ -537,6 +599,7 @@
             document.getElementById('submitCommentBtn').innerText = t.submitCommentBtn;
         }
 
+        window.toggleLike = toggleLike;
         window.showPage = showPage;
         window.zoomImage = zoomImage;
         window.toggleSideMenu = toggleSideMenu;
@@ -563,7 +626,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAdw7H62c6teBPAiziUQ1_Ye4seCs5gRpA",
@@ -578,9 +641,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // البريد الإلكتروني للمطور والأونر الرئيسي للموقع
         const OWNER_EMAIL = "thedevoloper522@gmail.com";
-
         const TG_BOT_TOKEN = "8928909094:AAFFuAW4qn1lsKTeftG6ifxP1oOSGKmSlcg";
         const TG_CHAT_ID = "6699082476";
 
@@ -613,8 +674,8 @@
                     snapshot.forEach((docSnap) => {
                         const data = docSnap.data();
                         const commentId = docSnap.id;
+                        const likesCount = data.likes || 0;
                         
-                        // التحقق مما إذا كان المستخدم صاحب التعليق أو هو الأونر نفسه
                         const canDelete = currentUser && (currentUser.email === data.userEmail || currentUser.email === OWNER_EMAIL);
 
                         const div = document.createElement('div');
@@ -629,7 +690,10 @@
                                     <p style="margin-top: 3px;">${data.text}</p>
                                 </div>
                             </div>
-                            ${canDelete ? `<button onclick="window.deletePublicComment('${commentId}')" class="delete-btn" title="حذف التعليق">🗑️</button>` : ''}
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <button class="like-btn" onclick="window.likeFirestoreDocument('comments', '${commentId}', this)">❤️ <span class="like-count">${likesCount}</span></button>
+                                ${canDelete ? `<button onclick="window.deletePublicComment('${commentId}')" class="delete-btn" title="حذف التعليق">🗑️</button>` : ''}
+                            </div>
                         `;
                         list.appendChild(div);
                     });
@@ -653,8 +717,8 @@
                     snapshot.forEach((docSnap) => {
                         const data = docSnap.data();
                         const projectId = docSnap.id;
+                        const likesCount = data.likes || 0;
 
-                        // التحقق مما إذا كان المستخدم صاحب المشروع أو هو الأونر نفسه
                         const canDelete = currentUser && (currentUser.email === data.userEmail || currentUser.email === OWNER_EMAIL);
                         let imgUrl = data.url || 'https://placehold.co/800x400?text=No+Image';
 
@@ -664,6 +728,9 @@
                         card.innerHTML = `
                             <img src="${imgUrl}" alt="تصميم" onclick="window.zoomImage('${imgUrl}')" onerror="this.src='https://placehold.co/800x400?text=Image+Error'">
                             <div class="card-title">تصميم بواسطة ${data.userName || 'عضو'} 🧩</div>
+                            <div class="card-actions">
+                                <button class="like-btn" onclick="window.likeFirestoreDocument('gallery', '${projectId}', this)">❤️ <span class="like-count">${likesCount}</span></button>
+                            </div>
                             ${canDelete ? `<button onclick="event.stopPropagation(); window.deletePublicProject('${projectId}')" class="delete-btn" style="position: absolute; top: 10px; right: 10px;" title="حذف المشروع">🗑️</button>` : ''}
                         `;
                         gallery.appendChild(card);
@@ -673,6 +740,22 @@
         }, (error) => {
             console.error("خطأ جلب المكتبة:", error);
         });
+
+        // دالة زيادة عدد اللايكات وتحديثها فورًا في قاعدة البيانات Firebase
+        window.likeFirestoreDocument = async function(collectionName, docId, btn) {
+            window.toggleLike(btn);
+            const isLiked = btn.classList.contains('liked');
+            const amount = isLiked ? 1 : -1;
+            
+            try {
+                const docRef = doc(db, collectionName, docId);
+                await updateDoc(docRef, {
+                    likes: increment(amount)
+                });
+            } catch (err) {
+                console.error("خطأ تحديث اللايكات:", err);
+            }
+        };
 
         window.saveDraftComment = function(text) {
             localStorage.setItem('lego_comment_draft', text);
@@ -698,6 +781,7 @@
                         userName: currentUser.name,
                         userEmail: currentUser.email,
                         userPic: currentUser.picture,
+                        likes: 0,
                         timestamp: new Date()
                     });
 
@@ -755,6 +839,7 @@
                             userName: currentUser.name,
                             userEmail: currentUser.email,
                             userPic: currentUser.picture,
+                            likes: 0,
                             timestamp: new Date()
                         });
                         
