@@ -201,7 +201,7 @@
         }
         .delete-btn:hover { background: #e3000b; transform: scale(1.1); }
 
-        /* --- تصميم الشات بوت الذكي المحلي --- */
+        /* --- تصميم الشات بوت الذكي --- */
         .chatbot-toggler {
             position: fixed; bottom: 30px; left: 30px;
             width: 60px; height: 60px; border-radius: 50%;
@@ -425,6 +425,10 @@
         let currentLang = 'ar';
         const GOOGLE_CLIENT_ID = "785859751432-8p7jq09n3vqhg8nooj76cne27u2loj77.apps.googleusercontent.com";
 
+        // --- GEMINI API INTEGRATION ---
+        const GEMINI_API_KEY = "AQ.Ab8RN6KCF5BioVnrCPtIiGJbeI6eZ1pHr-BLoR1zqdqfQlZepg";
+        const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
         const translations = {
             ar: {
                 langBtn: "English 🌐", menuHome: "الصفحة الرئيسية 🏠", menuShare: "شارك مشروعك 🚀",
@@ -546,25 +550,15 @@
         function enableNextStep() { document.getElementById('nextStep').style.display = 'block'; setTimeout(renderGoogleButtons, 100); }
 
         /* ========================================================
-           منطق الشات بوت الذكي المحلي (بدون API خارجي)
+           منطق الشات بوت الذكي باستخدام Gemini API الحقيقي
         ======================================================== */
         function toggleChatbot() {
             const chatWindow = document.getElementById('chatbotWindow');
             chatWindow.style.display = (chatWindow.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        // قاعدة معرفية شاملة عن LEGO
-        const legoKnowledgeBase = [
-            { keywords: ["تأسيس", "مؤسس", "متى", "بداية", "تاريخ", "أنشئت", "founded", "history", "creator"], answer: "تأسست شركة LEGO عام 1932 على يد النجار الدنماركي 'أولي كيرك كريستيانسن' (Ole Kirk Christiansen). بدأت بصناعة الألعاب الخشبية قبل الانتقال للمكعبات البلاستيكية الشهيرة عام 1949." },
-            { keywords: ["معنى", "اسم", "معناها", "meaning", "name"], answer: "اسم LEGO مأخوذ من الكلمتين الدنماركيتين 'Leg Godt' والتي تعني 'العب جيداً' (Play Well)." },
-            { keywords: ["سيتي", "city", "ليجو سيتي"], answer: "مجموعة Lego City هي واحدة من أشهر وأقدم سلاسل ليجو! تركز على بناء المدن الواقعية مثل مراكز الشرطة، إطفاء الحريق، المطار، سيارات السباق، والقطارات." },
-            { keywords: ["تقييم", "مشروع", "صورة", "ارفع", "rate", "evaluation"], answer: "يمكنك تقييم مشروعك بسهولة! اضغط على أيقونة الكاميرا 📸 بجانب خانة الكتابة وارفع صورة تصميمك، وسأقوم بتقييمه وإعطائك نصائح مبدعة فوراً." },
-            { keywords: ["موقع", "قسم", "شارك", "مكتبة", "تعليق", "تصفح", "website", "library"], answer: "موقعنا يتيح لك:\n1. تصفح المعرض الرئيسي 🏠\n2. رفع وتنسيق مشروعك من قسم 'شارك مشروعك' 🚀\n3. رؤية أعمال المبدعين في 'المكتبة العامة' 🖼️\n4. التفاعل مع الأعضاء في 'التعليقات' 💬" },
-            { keywords: ["كيف ابني", "نصائح", "طريقة", "احتراف", "tips", "build"], answer: "إليك أهم نصائح احتراف البناء بالليجو:\n1. ابدأ بقاعدة قوية (Baseplate).\n2. استخدم طريقة 'تشبيك الآجر' (Interlocking) بدلاً من وضع المكعبات فوق بعضها مباشرة لثبات أكبر.\n3. اخلط الألوان بشكل تناسقي لجعل الشكل جذاباً!" },
-            { keywords: ["سلام", "مرحبا", "أهلا", "ازيك", "hello", "hi", "hey"], answer: "أهلاً بك يا بطل الليجو! 🧱 كيف يمكنني مساعدتك اليوم في عالم Lego City؟" }
-        ];
-
-        function sendChatMessage() {
+        // إرسال النصوص إلى Gemini API
+        async function sendChatMessage() {
             const input = document.getElementById('chatInput');
             const userText = input.value.trim();
             if (!userText) return;
@@ -572,62 +566,88 @@
             appendChatBubble(userText, 'user');
             input.value = '';
 
-            setTimeout(() => {
-                const botReply = generateLocalBotReply(userText);
-                appendChatBubble(botReply, 'bot');
-            }, 400);
-        }
+            const loadingBubble = appendChatBubble(currentLang === 'ar' ? 'جاري التفكير... 🤖' : 'Thinking... 🤖', 'bot');
 
-        function generateLocalBotReply(text) {
-            const lowerText = text.toLowerCase();
-            for (let item of legoKnowledgeBase) {
-                if (item.keywords.some(kw => lowerText.includes(kw))) {
-                    return item.answer;
+            try {
+                const response = await fetch(GEMINI_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ 
+                                text: `أنت خبير ومساعد ذكي متخصص في ألعاب ومكعبات وعالم Lego City. أجب باختصار وبطريقة مشجعة ومرحة باللغة (${currentLang}): ${userText}`
+                            }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    const botReply = data.candidates[0].content.parts[0].text;
+                    loadingBubble.innerText = botReply;
+                } else {
+                    loadingBubble.innerText = currentLang === 'ar' ? "لم أتمكن من الحصول على إجابة، يرجى المحاولة لاحقاً." : "Could not retrieve a reply.";
                 }
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                loadingBubble.innerText = currentLang === 'ar' ? "عذراً، حدث خطأ أثناء الاتصال بالذكاء الاصطناعي." : "Error connecting to AI.";
             }
-            return currentLang === 'ar' 
-                ? "سؤال رائع! شركة الليجو هي عالم واسع من الإبداع. يمكنك استكشاف أقسام موقعنا لرفع تصاميمك، أو رفع صورة لمشروعك عبر زر الكاميرا 📸 لأقوم بتقييمه!" 
-                : "Great question! Lego is a vast world of creativity. Explore our site sections or upload your project image via the camera icon 📸 for instant rating!";
         }
 
-        function handleImageRating(event) {
+        // إرسال الصور وتحليلها بواسطة Gemini API
+        async function handleImageRating(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const imgUrl = e.target.result;
+            reader.onload = async function(e) {
+                const base64Data = e.target.result.split(',')[1];
                 
-                // عرض صورة المستخدم في الشات
-                const userBubble = document.createElement('div');
-                userBubble.className = 'chat-bubble user';
-                userBubble.innerHTML = `مشروعي الجديد 🧱:<br><img src="${imgUrl}" alt="Lego Project">`;
-                const container = document.getElementById('chatMessages');
-                container.appendChild(userBubble);
-                container.scrollTop = container.scrollHeight;
+                appendChatBubble(`<img src="${e.target.result}" style="max-width:200px; border-radius:10px;"><br>${currentLang === 'ar' ? 'قيم لي هذا البناء!' : 'Rate this build!'}`, 'user', true);
+                const loadingBubble = appendChatBubble(currentLang === 'ar' ? 'جاري فحص وتقييم مجسم الليجو الخاص بك بواسطة الذكاء الاصطناعي... 🔍' : 'Evaluating your Lego build... 🔍', 'bot');
 
-                // محاكاة رد الخبير وتقييم المشروع
-                setTimeout(() => {
-                    const ratings = [
-                        "🏆 **التقييم: 9.5 / 10**\n\nتصميم رهيب جداً! تركيب المكعبات متناسق والألوان متجانسة بشكل ممتاز. يستحق النشر في المكتبة العامة! 🌟",
-                        "🎨 **التقييم: 9.0 / 10**\n\nإبداع ما له حدود! فكرة البناء مبتكرة وممتازة. نصيحة خبير: حاول إضافة بعض التفاصيل الصغيرة مثل الشخصيات (Minifigures) لإعطائه حيوية أكثر! 🏙️",
-                        "⚡ **التقييم: 8.8 / 10**\n\nعمل رائع وقوي! ثبات الهيكل ممتاز جداً. استمر في تطوير مجسمات Lego City الخاصة بك! 🔥"
-                    ];
-                    const randomRating = ratings[Math.floor(Math.random() * ratings.length)];
-                    appendChatBubble(randomRating, 'bot');
-                }, 800);
+                try {
+                    const response = await fetch(GEMINI_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [
+                                    { text: `أنت خبير ليجو محترف. قم بتحليل الصورة المرفقة لمجسم أو بناء الليجو وقم بتقييمه وإعطاء نصائح تحسين مشجعة باللغة (${currentLang}).` },
+                                    { inline_data: { mime_type: file.type, data: base64Data } }
+                                ]
+                            }]
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        const botReply = data.candidates[0].content.parts[0].text;
+                        loadingBubble.innerText = botReply;
+                    } else {
+                        loadingBubble.innerText = currentLang === 'ar' ? "عذراً، لم استطع تحليل الصورة." : "Could not analyze the image.";
+                    }
+                } catch (err) {
+                    console.error("Gemini Vision Error:", err);
+                    loadingBubble.innerText = currentLang === 'ar' ? "حدث خطأ أثناء تحليل الصورة." : "Error analyzing image.";
+                }
             };
             reader.readAsDataURL(file);
             event.target.value = ''; // إعادة تعيين
         }
 
-        function appendChatBubble(text, sender) {
+        function appendChatBubble(text, sender, isHTML = false) {
             const container = document.getElementById('chatMessages');
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${sender}`;
-            bubble.innerText = text;
+            if (isHTML) {
+                bubble.innerHTML = text;
+            } else {
+                bubble.innerText = text;
+            }
             container.appendChild(bubble);
             container.scrollTop = container.scrollHeight;
+            return bubble;
         }
 
         function toggleLanguage() {
