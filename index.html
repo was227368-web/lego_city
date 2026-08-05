@@ -150,7 +150,6 @@
         .btn-danger { background: #e3000b; color: white; padding: 10px 20px; border: none; border-radius: 20px; font-weight: 700; cursor: pointer; }
         .btn:hover { transform: translateY(-2px); }
 
-        /* تصميم زر الـ Like */
         .like-btn {
             background: #ffffff;
             border: 2px solid #e0e0e0;
@@ -166,23 +165,12 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        .like-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .like-btn.liked {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+        .like-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .like-btn.liked { background: var(--primary); color: white; border-color: var(--primary); }
 
         .card-actions {
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            background: #fff;
-            border-top: 1px solid #f0f0f0;
+            padding: 10px; display: flex; justify-content: center;
+            background: #fff; border-top: 1px solid #f0f0f0;
         }
 
         .comment-item {
@@ -220,6 +208,69 @@
             flex-shrink: 0;
         }
         .delete-btn:hover { background: #e3000b; transform: scale(1.1); }
+
+        /* --- تصميم الشات بوت (Chatbot Styles) --- */
+        .chatbot-toggler {
+            position: fixed; bottom: 30px; left: 30px;
+            width: 60px; height: 60px; border-radius: 50%;
+            background: var(--primary); color: white; border: 3px solid var(--yellow);
+            font-size: 1.8rem; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25); z-index: 1500;
+        }
+        .chatbot-toggler:hover { transform: scale(1.1); }
+
+        html[dir="ltr"] .chatbot-toggler { left: auto; right: 30px; }
+
+        .chatbot-window {
+            display: none; position: fixed; bottom: 100px; left: 30px;
+            width: 350px; max-width: 90vw; height: 450px;
+            background: white; border-radius: 20px; border: 3px solid var(--yellow);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 1500;
+            flex-direction: column; overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        html[dir="ltr"] .chatbot-window { left: auto; right: 30px; }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; padding: 15px; text-align: center;
+            font-weight: 800; display: flex; justify-content: space-between; align-items: center;
+        }
+        .chat-header span { font-size: 1.1rem; }
+        .chat-header button { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
+
+        .chat-messages {
+            flex: 1; padding: 15px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 10px; background: #fafafa;
+        }
+
+        .chat-bubble {
+            max-width: 80%; padding: 10px 14px; border-radius: 15px;
+            font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;
+        }
+        .chat-bubble.bot {
+            background: #e9ecef; color: var(--dark);
+            align-self: flex-start; border-bottom-right-radius: 2px;
+        }
+        .chat-bubble.user {
+            background: var(--primary); color: white;
+            align-self: flex-end; border-bottom-left-radius: 2px;
+        }
+
+        .chat-input-container {
+            display: flex; padding: 10px; background: white; border-top: 1px solid #eee;
+        }
+        .chat-input-container input {
+            flex: 1; padding: 10px 15px; border: 1px solid #ccc;
+            border-radius: 20px; outline: none; font-family: inherit;
+        }
+        .chat-input-container button {
+            background: var(--yellow); border: none; padding: 8px 15px;
+            border-radius: 20px; margin-right: 8px; font-weight: bold; cursor: pointer;
+        }
+        html[dir="ltr"] .chat-input-container button { margin-right: 0; margin-left: 8px; }
     </style>
 </head>
 <body>
@@ -324,6 +375,22 @@
         </section>
     </div>
 
+    <button class="chatbot-toggler" onclick="toggleChatbot()" title="المساعد الذكي">🤖</button>
+
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chat-header">
+            <span id="chatTitle">مساعد Lego City 🤖</span>
+            <button onclick="toggleChatbot()">✖</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-bubble bot" id="botWelcome">مرحباً بك! 👋 أنا مساعدك الذكي في Lego City. كيف يمكنني مساعدتك اليوم؟</div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" id="chatInput" placeholder="اكتب سؤالك هنا..." onkeydown="if(event.key === 'Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()" id="chatSendBtn">إرسال</button>
+        </div>
+    </div>
+
     <div class="lightbox-modal" id="lightboxModal" onclick="closeZoom()">
         <img id="lightboxImage" src="" alt="صورة مكبرة">
     </div>
@@ -393,7 +460,11 @@
                 loginSuccess: "تم تسجيل الدخول بنجاح! 🚀",
                 noComments: "لا توجد تعليقات بعد. كن أول من يعلق!",
                 member: "عضو",
-                byUser: "تصميم بواسطة"
+                byUser: "تصميم بواسطة",
+                chatTitle: "مساعد Lego City 🤖",
+                botWelcome: "مرحباً بك! 👋 أنا مساعدك الذكي في Lego City. كيف يمكنني مساعدتك اليوم؟",
+                chatInputPlaceholder: "اكتب سؤالك هنا...",
+                chatSendBtn: "إرسال"
             },
             en: {
                 langBtn: "العربية 🌐",
@@ -431,11 +502,14 @@
                 loginSuccess: "Successfully signed in! 🚀",
                 noComments: "No comments yet. Be the first to comment!",
                 member: "Member",
-                byUser: "Designed by"
+                byUser: "Designed by",
+                chatTitle: "Lego City Assistant 🤖",
+                botWelcome: "Hello! 👋 I am your Lego City assistant. How can I help you today?",
+                chatInputPlaceholder: "Type your question here...",
+                chatSendBtn: "Send"
             }
         };
 
-        // دالة الـ Like البسيطة للواجهة
         function toggleLike(btn) {
             const countSpan = btn.querySelector('.like-count');
             let count = parseInt(countSpan.innerText);
@@ -565,6 +639,64 @@
             setTimeout(renderGoogleButtons, 100);
         }
 
+        /* --- منطق الشات بوت (Chatbot Logic) --- */
+        function toggleChatbot() {
+            const chatWindow = document.getElementById('chatbotWindow');
+            chatWindow.style.display = (chatWindow.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const messagesContainer = document.getElementById('chatMessages');
+            const userText = input.value.trim();
+
+            if (!userText) return;
+
+            // عرض رسالة المستخدم
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'chat-bubble user';
+            userMsgDiv.innerText = userText;
+            messagesContainer.appendChild(userMsgDiv);
+
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // إعداد رد آلي محاكي الذكاء الاصطناعي
+            setTimeout(() => {
+                const botMsgDiv = document.createElement('div');
+                botMsgDiv.className = 'chat-bubble bot';
+                botMsgDiv.innerText = getBotResponse(userText.toLowerCase());
+                messagesContainer.appendChild(botMsgDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 600);
+        }
+
+        function getBotResponse(text) {
+            if (currentLang === 'ar') {
+                if (text.includes('مرحبا') || text.includes('اهلين') || text.includes('سلام')) {
+                    return "أهلاً بك في Lego City! كيف يمكنني مساعدتك اليوم؟ 🧱";
+                } else if (text.includes('كيف') && (text.includes('ارفع') || text.includes('انشر') || text.includes('شارك'))) {
+                    return "يمكنك مشاركة تصميمك من خلال النقر على القائمة ☰ ثم اختيار 'شارك مشروعك 🚀' ورفع صورة تصاميمك!";
+                } else if (text.includes('تسجيل') || text.includes('دخول') || text.includes('حساب')) {
+                    return "يمكنك تسجيل الدخول بالضغط على أيقونة الشخص 👤 في أعلى الصفحة واستخدام حساب جوجل الخاص بك.";
+                } else if (text.includes('من انت') || text.includes('مين انت')) {
+                    return "أنا المساعد الذكي الخاص بموقع Lego City، موجود لمساعدتك في تصفح الموقع ومشاركة ابداعاتك!";
+                } else {
+                    return "شكراً لتواصلك! يمكنك استكشاف التصاميم المميزة في 'مكتبة التصاميم العامة' أو مشاركة أفكارك في صفحة التعليقات. 🌟";
+                }
+            } else {
+                if (text.includes('hello') || text.includes('hi') || text.includes('hey')) {
+                    return "Hello! Welcome to Lego City. How can I help you today? 🧱";
+                } else if (text.includes('upload') || text.includes('share')) {
+                    return "You can share your creation by opening the menu ☰, clicking 'Share Your Project 🚀', and uploading an image!";
+                } else if (text.includes('login') || text.includes('sign in') || text.includes('account')) {
+                    return "You can sign in using the profile icon 👤 on top of the page with your Google account.";
+                } else {
+                    return "Thanks for asking! Feel free to explore our Public Library or share your comments. 🌟";
+                }
+            }
+        }
+
         function toggleLanguage() {
             const html = document.getElementById('htmlTag');
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
@@ -597,6 +729,12 @@
             document.getElementById('commentsDesc').innerText = t.commentsDesc;
             document.getElementById('commentInput').placeholder = t.commentPlaceholder;
             document.getElementById('submitCommentBtn').innerText = t.submitCommentBtn;
+            
+            // تحديث نصوص الشات بوت
+            document.getElementById('chatTitle').innerText = t.chatTitle;
+            document.getElementById('botWelcome').innerText = t.botWelcome;
+            document.getElementById('chatInput').placeholder = t.chatInputPlaceholder;
+            document.getElementById('chatSendBtn').innerText = t.chatSendBtn;
         }
 
         window.toggleLike = toggleLike;
@@ -611,6 +749,8 @@
         window.enableNextStep = enableNextStep;
         window.toggleLanguage = toggleLanguage;
         window.logout = logout;
+        window.toggleChatbot = toggleChatbot;
+        window.sendChatMessage = sendChatMessage;
 
         window.onload = function() {
             checkPersistentLogin();
@@ -660,7 +800,6 @@
             }
         }
 
-        // 1. الاستماع للتعليقات
         const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
         onSnapshot(qComments, (snapshot) => {
             const list = document.getElementById('commentsList');
@@ -706,7 +845,6 @@
             console.error("خطأ جلب التعليقات:", error);
         });
 
-        // 2. الاستماع للصور والمشاريع
         const qImages = query(collection(db, "gallery"), orderBy("timestamp", "desc"));
         onSnapshot(qImages, (snapshot) => {
             const gallery = document.getElementById('publicGallery');
@@ -747,7 +885,6 @@
             console.error("خطأ جلب المكتبة:", error);
         });
 
-        // دالة التفاعل بالإعجاب المقيدة بالحساب
         window.likeFirestoreDocument = async function(collectionName, docId, btn) {
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
 
@@ -779,7 +916,6 @@
             localStorage.setItem('lego_comment_draft', text);
         };
 
-        // 3. نشر تعليق جديد
         window.addPublicComment = async function() {
             const input = document.getElementById('commentInput');
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
@@ -817,7 +953,6 @@
             }
         };
 
-        // 4. حذف تعليق
         window.deletePublicComment = async function(commentId) {
             if (confirm('هل أنت متأكد من رغبتك في حذف هذا التعليق؟')) {
                 try {
@@ -830,7 +965,6 @@
             }
         };
 
-        // 5. رفع صورة / مشروع
         window.uploadPublicProject = function() {
             const fileInput = document.getElementById('projectImageInput');
             const statusMsg = document.getElementById('uploadStatusMsg');
@@ -885,7 +1019,6 @@
             }
         };
 
-        // 6. حذف مشروع
         window.deletePublicProject = async function(projectId) {
             if (confirm('هل أنت متأكد من رغبتك في حذف هذا المشروع؟')) {
                 try {
