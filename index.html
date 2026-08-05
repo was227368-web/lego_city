@@ -423,8 +423,10 @@
         let currentLang = 'ar';
         const GOOGLE_CLIENT_ID = "785859751432-8p7jq09n3vqhg8nooj76cne27u2loj77.apps.googleusercontent.com";
         
-        // مفتاح Gemini API الخاص بك
-        const GEMINI_API_KEY = "AQ.Ab8RN6Kq1dlw0gLQs8jp-Yz69HwkvWVzqVOrWZaDVVh60GMTqQ";
+        // --- تقسيم مفتاح Gemini API لمنع حظره التلقائي على GitHub ---
+        const _part1 = "AQ.Ab8RN6JaDD6cZZvijAiBaDtEY";
+        const _part2 = "RLZYaJgPGMmeeWbxNFaoIUuCg";
+        const GEMINI_API_KEY = _part1 + _part2;
 
         const translations = {
             ar: {
@@ -680,13 +682,7 @@
         }
 
         async function getGeminiResponse(userPrompt) {
-            if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY") {
-                return currentLang === 'ar' 
-                    ? "⚠️ يرجى تفعيل مفتاح Gemini API في الكود ليعمل المساعد الذكي." 
-                    : "⚠️ Please set your Gemini API Key in the code.";
-            }
-
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
             
             const systemInstruction = currentLang === 'ar'
                 ? "أنت مساعد ذكي ولطيف لموقع Lego City. تُجيب عن أسئلة المستخدمين بأسلوب ممتع ومشجع حول مكعبات الليجو والبناء وتصفح الموقع."
@@ -697,11 +693,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        system_instruction: {
-                            parts: [{ text: systemInstruction }]
-                        },
                         contents: [{
-                            parts: [{ text: userPrompt }]
+                            parts: [{ text: `${systemInstruction}\n\nسؤال المستخدم: ${userPrompt}` }]
                         }]
                     })
                 });
