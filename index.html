@@ -626,7 +626,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAdw7H62c6teBPAiziUQ1_Ye4seCs5gRpA",
@@ -674,7 +674,10 @@
                     snapshot.forEach((docSnap) => {
                         const data = docSnap.data();
                         const commentId = docSnap.id;
-                        const likesCount = data.likes || 0;
+                        
+                        const likesArray = data.likedBy || [];
+                        const likesCount = likesArray.length;
+                        const isLiked = currentUser && likesArray.includes(currentUser.email);
                         
                         const canDelete = currentUser && (currentUser.email === data.userEmail || currentUser.email === OWNER_EMAIL);
 
@@ -691,7 +694,7 @@
                                 </div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <button class="like-btn" onclick="window.likeFirestoreDocument('comments', '${commentId}', this)">❤️ <span class="like-count">${likesCount}</span></button>
+                                <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="window.likeFirestoreDocument('comments', '${commentId}', this)">❤️ <span class="like-count">${likesCount}</span></button>
                                 ${canDelete ? `<button onclick="window.deletePublicComment('${commentId}')" class="delete-btn" title="حذف التعليق">🗑️</button>` : ''}
                             </div>
                         `;
@@ -717,7 +720,10 @@
                     snapshot.forEach((docSnap) => {
                         const data = docSnap.data();
                         const projectId = docSnap.id;
-                        const likesCount = data.likes || 0;
+                        
+                        const likesArray = data.likedBy || [];
+                        const likesCount = likesArray.length;
+                        const isLiked = currentUser && likesArray.includes(currentUser.email);
 
                         const canDelete = currentUser && (currentUser.email === data.userEmail || currentUser.email === OWNER_EMAIL);
                         let imgUrl = data.url || 'https://placehold.co/800x400?text=No+Image';
@@ -729,7 +735,7 @@
                             <img src="${imgUrl}" alt="تصميم" onclick="window.zoomImage('${imgUrl}')" onerror="this.src='https://placehold.co/800x400?text=Image+Error'">
                             <div class="card-title">تصميم بواسطة ${data.userName || 'عضو'} 🧩</div>
                             <div class="card-actions">
-                                <button class="like-btn" onclick="window.likeFirestoreDocument('gallery', '${projectId}', this)">❤️ <span class="like-count">${likesCount}</span></button>
+                                <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="window.likeFirestoreDocument('gallery', '${projectId}', this)">❤️ <span class="like-count">${likesCount}</span></button>
                             </div>
                             ${canDelete ? `<button onclick="event.stopPropagation(); window.deletePublicProject('${projectId}')" class="delete-btn" style="position: absolute; top: 10px; right: 10px;" title="حذف المشروع">🗑️</button>` : ''}
                         `;
@@ -741,17 +747,29 @@
             console.error("خطأ جلب المكتبة:", error);
         });
 
-        // دالة زيادة عدد اللايكات وتحديثها فورًا في قاعدة البيانات Firebase
+        // دالة التفاعل بالإعجاب المقيدة بالحساب
         window.likeFirestoreDocument = async function(collectionName, docId, btn) {
-            window.toggleLike(btn);
+            const currentUser = JSON.parse(localStorage.getItem('lego_user'));
+
+            if (!currentUser) {
+                alert('يرجى تسجيل الدخول بحساب جوجل أولاً لإبداء الاعجاب!');
+                window.openAuthModal();
+                return;
+            }
+
+            const docRef = doc(db, collectionName, docId);
             const isLiked = btn.classList.contains('liked');
-            const amount = isLiked ? 1 : -1;
-            
+
             try {
-                const docRef = doc(db, collectionName, docId);
-                await updateDoc(docRef, {
-                    likes: increment(amount)
-                });
+                if (isLiked) {
+                    await updateDoc(docRef, {
+                        likedBy: arrayRemove(currentUser.email)
+                    });
+                } else {
+                    await updateDoc(docRef, {
+                        likedBy: arrayUnion(currentUser.email)
+                    });
+                }
             } catch (err) {
                 console.error("خطأ تحديث اللايكات:", err);
             }
@@ -781,7 +799,7 @@
                         userName: currentUser.name,
                         userEmail: currentUser.email,
                         userPic: currentUser.picture,
-                        likes: 0,
+                        likedBy: [],
                         timestamp: new Date()
                     });
 
@@ -839,7 +857,7 @@
                             userName: currentUser.name,
                             userEmail: currentUser.email,
                             userPic: currentUser.picture,
-                            likes: 0,
+                            likedBy: [],
                             timestamp: new Date()
                         });
                         
