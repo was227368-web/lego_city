@@ -422,6 +422,9 @@
     <script>
         let currentLang = 'ar';
         const GOOGLE_CLIENT_ID = "785859751432-8p7jq09n3vqhg8nooj76cne27u2loj77.apps.googleusercontent.com";
+        
+        // مفتاح Gemini API الخاص بك
+        const GEMINI_API_KEY = "AQ.Ab8RN6Kq1dlw0gLQs8jp-Yz69HwkvWVzqVOrWZaDVVh60GMTqQ";
 
         const translations = {
             ar: {
@@ -639,20 +642,20 @@
             setTimeout(renderGoogleButtons, 100);
         }
 
-        /* --- منطق الشات بوت (Chatbot Logic) --- */
+        /* --- منطق الشات بوت المربوط بـ Gemini API --- */
         function toggleChatbot() {
             const chatWindow = document.getElementById('chatbotWindow');
             chatWindow.style.display = (chatWindow.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        function sendChatMessage() {
+        async function sendChatMessage() {
             const input = document.getElementById('chatInput');
             const messagesContainer = document.getElementById('chatMessages');
             const userText = input.value.trim();
 
             if (!userText) return;
 
-            // عرض رسالة المستخدم
+            // 1. عرض رسالة المستخدم
             const userMsgDiv = document.createElement('div');
             userMsgDiv.className = 'chat-bubble user';
             userMsgDiv.innerText = userText;
@@ -661,39 +664,60 @@
             input.value = '';
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            // إعداد رد آلي محاكي الذكاء الاصطناعي
-            setTimeout(() => {
-                const botMsgDiv = document.createElement('div');
-                botMsgDiv.className = 'chat-bubble bot';
-                botMsgDiv.innerText = getBotResponse(userText.toLowerCase());
-                messagesContainer.appendChild(botMsgDiv);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }, 600);
+            // 2. عرض مؤشر الانتظار (جاري التفكير)
+            const loadingMsgDiv = document.createElement('div');
+            loadingMsgDiv.className = 'chat-bubble bot';
+            loadingMsgDiv.innerText = currentLang === 'ar' ? 'جاري التفكير... ⏳' : 'Thinking... ⏳';
+            messagesContainer.appendChild(loadingMsgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // 3. استدعاء Gemini API
+            const botReply = await getGeminiResponse(userText);
+
+            // 4. تحديث الفقرة بالرد النهائي من Gemini
+            loadingMsgDiv.innerText = botReply;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        function getBotResponse(text) {
-            if (currentLang === 'ar') {
-                if (text.includes('مرحبا') || text.includes('اهلين') || text.includes('سلام')) {
-                    return "أهلاً بك في Lego City! كيف يمكنني مساعدتك اليوم؟ 🧱";
-                } else if (text.includes('كيف') && (text.includes('ارفع') || text.includes('انشر') || text.includes('شارك'))) {
-                    return "يمكنك مشاركة تصميمك من خلال النقر على القائمة ☰ ثم اختيار 'شارك مشروعك 🚀' ورفع صورة تصاميمك!";
-                } else if (text.includes('تسجيل') || text.includes('دخول') || text.includes('حساب')) {
-                    return "يمكنك تسجيل الدخول بالضغط على أيقونة الشخص 👤 في أعلى الصفحة واستخدام حساب جوجل الخاص بك.";
-                } else if (text.includes('من انت') || text.includes('مين انت')) {
-                    return "أنا المساعد الذكي الخاص بموقع Lego City، موجود لمساعدتك في تصفح الموقع ومشاركة ابداعاتك!";
-                } else {
-                    return "شكراً لتواصلك! يمكنك استكشاف التصاميم المميزة في 'مكتبة التصاميم العامة' أو مشاركة أفكارك في صفحة التعليقات. 🌟";
+        async function getGeminiResponse(userPrompt) {
+            if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY") {
+                return currentLang === 'ar' 
+                    ? "⚠️ يرجى تفعيل مفتاح Gemini API في الكود ليعمل المساعد الذكي." 
+                    : "⚠️ Please set your Gemini API Key in the code.";
+            }
+
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+            
+            const systemInstruction = currentLang === 'ar'
+                ? "أنت مساعد ذكي ولطيف لموقع Lego City. تُجيب عن أسئلة المستخدمين بأسلوب ممتع ومشجع حول مكعبات الليجو والبناء وتصفح الموقع."
+                : "You are a friendly and helpful assistant for the Lego City website. Answer user questions about Lego, building, and navigating the site.";
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        system_instruction: {
+                            parts: [{ text: systemInstruction }]
+                        },
+                        contents: [{
+                            parts: [{ text: userPrompt }]
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
                 }
-            } else {
-                if (text.includes('hello') || text.includes('hi') || text.includes('hey')) {
-                    return "Hello! Welcome to Lego City. How can I help you today? 🧱";
-                } else if (text.includes('upload') || text.includes('share')) {
-                    return "You can share your creation by opening the menu ☰, clicking 'Share Your Project 🚀', and uploading an image!";
-                } else if (text.includes('login') || text.includes('sign in') || text.includes('account')) {
-                    return "You can sign in using the profile icon 👤 on top of the page with your Google account.";
-                } else {
-                    return "Thanks for asking! Feel free to explore our Public Library or share your comments. 🌟";
-                }
+
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text;
+
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                return currentLang === 'ar'
+                    ? "عذراً، حدث خطأ أثناء الاتصال بالمساعد الذكي. حاول مجدداً لاحقاً."
+                    : "Sorry, an error occurred while connecting to Gemini. Please try again later.";
             }
         }
 
