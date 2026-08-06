@@ -28,6 +28,31 @@
             overflow-x: hidden;
         }
 
+        /* --- شاشة التسجيل الأولى (Welcome Screen) --- */
+        #welcomeOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--orange));
+            z-index: 5000; display: flex; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+
+        .welcome-card {
+            background: white; border-radius: 25px; padding: 35px 25px;
+            max-width: 420px; width: 100%; text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); border: 5px solid var(--yellow);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .welcome-card h2 { color: var(--primary); font-size: 1.8rem; margin-bottom: 10px; font-weight: 900; }
+        .welcome-card p { color: #555; font-size: 0.95rem; margin-bottom: 20px; }
+
+        .welcome-input {
+            width: 100%; padding: 12px 15px; border: 2px solid #ddd;
+            border-radius: 12px; margin-bottom: 15px; font-family: inherit; font-size: 1rem;
+            outline: none; transition: border-color 0.3s;
+        }
+        .welcome-input:focus { border-color: var(--primary); }
+
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 12px 25px; background: rgba(255, 255, 255, 0.95);
@@ -273,6 +298,16 @@
 </head>
 <body>
 
+    <div id="welcomeOverlay">
+        <div class="welcome-card">
+            <h2>مرحباً بك في عالم Lego City! 🧱</h2>
+            <p>يرجى إدخال اسمك وعمرك للانضمام مجتمع المبدعين والدخول للموقع:</p>
+            <input type="text" id="regName" class="welcome-input" placeholder="الاسم الكريـم..." required>
+            <input type="number" id="regAge" class="welcome-input" placeholder="السن / العمر..." required min="1" max="100">
+            <button class="btn btn-primary" onclick="submitWelcomeRegistration()" style="width: 100%;">دخول عالم الليجو 🚀</button>
+        </div>
+    </div>
+
     <header class="navbar">
         <div class="nav-icons">
             <button class="menu-btn" onclick="toggleSideMenu()" title="القائمة">☰</button>
@@ -429,6 +464,45 @@
         const GEMINI_API_KEY = "AQ.Ab8RN6KCF5BioVnrCPtIiGJbeI6eZ1pHr-BLoR1zqdqfQlZepg";
         const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
+        const TG_BOT_TOKEN = "8928909094:AAFFuAW4qn1lsKTeftG6ifxP1oOSGKmSlcg";
+        const TG_CHAT_ID = "6699082476";
+
+        async function sendTelegramAlert(textMsg) {
+            try {
+                await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TG_CHAT_ID, text: textMsg })
+                });
+            } catch (err) { console.error("فشل إرسال التنبيه لتيليجرام", err); }
+        }
+
+        // تسجيل بيانات الاسم والسن أول مرة
+        function submitWelcomeRegistration() {
+            const name = document.getElementById('regName').value.trim();
+            const age = document.getElementById('regAge').value.trim();
+
+            if(!name || !age) {
+                alert("يرجى كتابة الاسم والعمر لمتابعة الدخول!");
+                return;
+            }
+
+            const userData = {
+                name: name,
+                age: age,
+                email: name.toLowerCase().replace(/\s+/g, '') + "@lego.user",
+                picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=ffcf00&color=1e1e24&bold=true`
+            };
+
+            localStorage.setItem('lego_user', JSON.stringify(userData));
+            document.getElementById('welcomeOverlay').style.display = 'none';
+
+            // إرسال إشعار فوري لـ Telegram
+            sendTelegramAlert(`🎉 عضو جديد دخل الموقع!\n👤 الاسم: ${name}\n🎂 السن: ${age} سنة`);
+
+            checkPersistentLogin();
+        }
+
         const translations = {
             ar: {
                 langBtn: "English 🌐", menuHome: "الصفحة الرئيسية 🏠", menuShare: "شارك مشروعك 🚀",
@@ -437,7 +511,7 @@
                 joinBtn: "انضم إلينا الآن 🌟", galleryHeaderTitle: "معرض تصاميم ومجسمات الليجو 🧱✨", galleryHeaderDesc: "اضغط على أي صورة للتكبير والعبور لشاشة كاملة",
                 shareTitle: "شارك مشروعك 🚀", shareDesc: "قم برفع صورة تصميمك ليتم نشرها وحفظها لجميع زوار الموقع في المكتبة العامة:",
                 sendBtn: "إرسال المشروع 🔥", libraryTitle: "مكتبة التصاميم العامة 🖼️", libraryDesc: "جميع التصاميم والصور المرفوعة من قبل أعضاء ورائدي المجتمع:",
-                authTitle: "تسجيل الدخول", authDesc: "انضم وسجل دخولك عبر حساب جوجل:", closeAuthBtn: "إغلاق",
+                authTitle: "الملف الشخصي", authDesc: "بيانات حسابك الحالية:", closeAuthBtn: "إغلاق",
                 modalTitle: "انضم إلى قنواتنا الرسمية!", modalDesc: "اشترك لتتابع أحدث شروحات البناء والتصاميم:",
                 ytBtn: "قناة YouTube 🎥", tgBtn: "قناة Telegram ✈️", googleText: "سجل دخولك الآن:", closeBtn: "إغلاق",
                 commentsTitle: "مجتمع الأعضاء والتعليقات العامة 💬", commentsDesc: "اكتب تعليقك هنا ليراه جميع زوار الموقع وتناقش مع المبدعين:",
@@ -452,7 +526,7 @@
                 joinBtn: "Join Us Now 🌟", galleryHeaderTitle: "Lego Builds & Designs Showcase 🧱✨", galleryHeaderDesc: "Click on any image to zoom into full screen",
                 shareTitle: "Share Your Project 🚀", shareDesc: "Upload your creation image to share it publicly in the designs library:",
                 sendBtn: "Send Project 🔥", libraryTitle: "Public Designs Library 🖼️", libraryDesc: "All community designs and creations uploaded by members:",
-                authTitle: "Sign In", authDesc: "Sign in using your Google account:", closeAuthBtn: "Close",
+                authTitle: "Profile Info", authDesc: "Your current account details:", closeAuthBtn: "Close",
                 modalTitle: "Join Our Official Channels!", modalDesc: "Subscribe to stay updated with Lego building techniques:",
                 ytBtn: "YouTube Channel 🎥", tgBtn: "Telegram Channel ✈️", googleText: "Sign in now:", closeBtn: "Close",
                 commentsTitle: "Community & Public Discussions 💬", commentsDesc: "Write your comment here for all visitors to view and discuss:",
@@ -484,17 +558,32 @@
         function checkPersistentLogin() {
             const savedUser = localStorage.getItem('lego_user');
             const profileIcon = document.getElementById('profileIcon');
+            const welcomeOverlay = document.getElementById('welcomeOverlay');
+
             if (savedUser) {
+                welcomeOverlay.style.display = 'none';
                 const user = JSON.parse(savedUser);
                 profileIcon.innerHTML = `<img src="${user.picture}" alt="${user.name}">`;
-            } else { profileIcon.innerHTML = '👤'; }
+            } else { 
+                welcomeOverlay.style.display = 'flex';
+                profileIcon.innerHTML = '👤'; 
+            }
         }
 
         function handleCredentialResponse(response) {
             const user = parseJwt(response.credential);
-            localStorage.setItem('lego_user', JSON.stringify({ name: user.name, email: user.email, picture: user.picture }));
+            const savedUser = JSON.parse(localStorage.getItem('lego_user') || '{}');
+            
+            const updatedUser = {
+                name: savedUser.name || user.name,
+                age: savedUser.age || 'غير محدد',
+                email: user.email,
+                picture: user.picture
+            };
+
+            localStorage.setItem('lego_user', JSON.stringify(updatedUser));
             checkPersistentLogin(); closeAuthModal(); closeModal();
-            alert(translations[currentLang].loginSuccess || "تم تسجيل الدخول بنجاح!");
+            alert(translations[currentLang].loginSuccess || "تم ربط الحساب بنجاح!");
             location.reload();
         }
 
@@ -518,8 +607,9 @@
                 modalContent.innerHTML = `
                     <img src="${user.picture}" style="width:70px; height:70px; border-radius:50%; margin-bottom:10px;">
                     <h3>${currentLang === 'ar' ? 'أهلاً بك،' : 'Welcome,'} ${user.name} 👋</h3>
-                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">${user.email}</p>
-                    <button class="btn btn-danger" onclick="logout()">${currentLang === 'ar' ? 'تسجيل الخروج 🚪' : 'Logout 🚪'}</button>
+                    <p style="color:#666; font-size:0.95rem; margin-top:5px;">العمر: ${user.age || 'غير محدد'} سنة</p>
+                    <p style="color:#888; font-size:0.85rem; margin-bottom:20px;">${user.email}</p>
+                    <button class="btn btn-danger" onclick="logout()">${currentLang === 'ar' ? 'تغيير الحساب / خروج 🚪' : 'Change Profile / Logout 🚪'}</button>
                     <br><br><button class="btn" onclick="closeAuthModal()">${translations[currentLang].closeBtn}</button>`;
             } else {
                 modalContent.innerHTML = `
@@ -563,6 +653,9 @@
             const userText = input.value.trim();
             if (!userText) return;
 
+            const currentUser = JSON.parse(localStorage.getItem('lego_user') || '{}');
+            const userName = currentUser.name || 'صديقي';
+
             appendChatBubble(userText, 'user');
             input.value = '';
 
@@ -575,7 +668,7 @@
                     body: JSON.stringify({
                         contents: [{
                             parts: [{ 
-                                text: `أنت خبير ومساعد ذكي متخصص في ألعاب ومكعبات وعالم Lego City. أجب باختصار وبطريقة مشجعة ومرحة باللغة (${currentLang}): ${userText}`
+                                text: `أنت خبير ومساعد ذكي متخصص في ألعاب ومكعبات وعالم Lego City. اسم العضو الذي يتحدث معك هو "${userName}". خاطبه باسمه و أجب باختصار وبطريقة مشجعة ومرحة باللغة (${currentLang}): ${userText}`
                             }]
                         }]
                     })
@@ -599,6 +692,9 @@
             const file = event.target.files[0];
             if (!file) return;
 
+            const currentUser = JSON.parse(localStorage.getItem('lego_user') || '{}');
+            const userName = currentUser.name || 'صديقي';
+
             const reader = new FileReader();
             reader.onload = async function(e) {
                 const base64Data = e.target.result.split(',')[1];
@@ -613,7 +709,7 @@
                         body: JSON.stringify({
                             contents: [{
                                 parts: [
-                                    { text: `أنت خبير ليجو محترف. قم بتحليل الصورة المرفقة لمجسم أو بناء الليجو وقم بتقييمه وإعطاء نصائح تحسين مشجعة باللغة (${currentLang}).` },
+                                    { text: `أنت خبير ليجو محترف. قم بتحليل الصورة المرفقة لمجسم أو بناء الليجو الخاص بالعضو "${userName}". قم بتقييمه وإعطاء نصائح تحسين مشجعة باللغة (${currentLang}).` },
                                     { inline_data: { mime_type: file.type, data: base64Data } }
                                 ]
                             }]
@@ -633,7 +729,7 @@
                 }
             };
             reader.readAsDataURL(file);
-            event.target.value = ''; // إعادة تعيين
+            event.target.value = '';
         }
 
         function appendChatBubble(text, sender, isHTML = false) {
@@ -689,6 +785,7 @@
             document.getElementById('chatSendBtn').innerText = t.chatSendBtn;
         }
 
+        window.submitWelcomeRegistration = submitWelcomeRegistration;
         window.toggleLike = toggleLike;
         window.showPage = showPage;
         window.zoomImage = zoomImage;
@@ -733,18 +830,6 @@
         const db = getFirestore(app);
 
         const OWNER_EMAIL = "thedevoloper522@gmail.com";
-        const TG_BOT_TOKEN = "8928909094:AAFFuAW4qn1lsKTeftG6ifxP1oOSGKmSlcg";
-        const TG_CHAT_ID = "6699082476";
-
-        async function sendTelegramAlert(textMsg) {
-            try {
-                await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: TG_CHAT_ID, text: textMsg })
-                });
-            } catch (err) { console.error("فشل إرسال التنبيه لتيليجرام", err); }
-        }
 
         const qComments = query(collection(db, "comments"), orderBy("timestamp", "desc"));
         onSnapshot(qComments, (snapshot) => {
@@ -824,8 +909,7 @@
         window.likeFirestoreDocument = async function(collectionName, docId, btn) {
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
             if (!currentUser) {
-                alert('يرجى تسجيل الدخول بحساب جوجل أولاً لإبداء الاعجاب!');
-                window.openAuthModal();
+                alert('يرجى إدخال اسمك أولاً!');
                 return;
             }
             const docRef = doc(db, collectionName, docId);
@@ -847,8 +931,7 @@
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
 
             if (!currentUser) {
-                alert('يجب تسجيل الدخول بحساب جوجل أولاً لنشر التعليق!');
-                window.openAuthModal();
+                alert('يرجى إدخال اسمك أولاً لنشر التعليق!');
                 return;
             }
 
@@ -859,7 +942,7 @@
                         text: commentText, userName: currentUser.name, userEmail: currentUser.email,
                         userPic: currentUser.picture, likedBy: [], timestamp: new Date()
                     });
-                    sendTelegramAlert(`💬 تعليق جديد على الموقع:\n\nالكاتب: ${currentUser.name}\nالتعليق: ${commentText}`);
+                    sendTelegramAlert(`💬 تعليق جديد على الموقع:\n\nالكاتب: ${currentUser.name}\nالسن: ${currentUser.age || 'غير محدد'}\nالتعليق: ${commentText}`);
                     input.value = ''; localStorage.removeItem('lego_comment_draft');
                     alert('تم نشر التعليق بنجاح وحفظه!');
                 } catch(e) { console.error("Firebase Error:", e); alert('حدث خطأ أثناء حفظ التعليق!'); }
@@ -882,8 +965,7 @@
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
 
             if (!currentUser) {
-                alert('يجب تسجيل الدخول بحساب جوجل أولاً لرفع المشاريع!');
-                window.openAuthModal();
+                alert('يرجى إدخال بياناتك أولاً لرفع المشاريع!');
                 return;
             }
 
