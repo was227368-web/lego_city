@@ -28,7 +28,7 @@
             overflow-x: hidden;
         }
 
-        /* --- شاشة التسجيل الأولى (Welcome Screen) --- */
+        /* --- شاشة التسجيل الأولى (Welcome Overlay) --- */
         #welcomeOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, var(--primary), var(--orange));
@@ -52,6 +52,15 @@
             outline: none; transition: border-color 0.3s;
         }
         .welcome-input:focus { border-color: var(--primary); }
+
+        .divider {
+            display: flex; align-items: center; text-align: center; color: #888; margin: 15px 0; font-weight: bold; font-size: 0.85rem;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; border-bottom: 1px solid #ddd;
+        }
+        .divider:not(:empty)::before { margin-left: .5em; }
+        .divider:not(:empty)::after { margin-right: .5em; }
 
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
@@ -226,7 +235,7 @@
         }
         .delete-btn:hover { background: #e3000b; transform: scale(1.1); }
 
-        /* --- تصميم الشات بوت المحلي المطور --- */
+        /* --- تصميم الشات بوت --- */
         .chatbot-toggler {
             position: fixed; bottom: 30px; left: 30px;
             width: 60px; height: 60px; border-radius: 50%;
@@ -274,9 +283,6 @@
             background: var(--primary); color: white;
             align-self: flex-end; border-bottom-left-radius: 2px;
         }
-        .chat-bubble img {
-            max-width: 100%; border-radius: 10px; margin-top: 5px; border: 2px solid var(--yellow);
-        }
 
         .chat-options-container {
             padding: 10px; background: #fff; border-top: 2px solid var(--yellow);
@@ -297,9 +303,16 @@
     <div id="welcomeOverlay">
         <div class="welcome-card">
             <h2>مرحباً بك في عالم Lego City! 🧱</h2>
-            <p>يرجى إدخال اسمك وعمرك للانضمام مجتمع المبدعين والدخول للموقع:</p>
-            <input type="text" id="regName" class="welcome-input" placeholder="الاسم الكريـم..." required>
-            <input type="number" id="regAge" class="welcome-input" placeholder="السن / العمر..." required min="1" max="100">
+            <p>اختر طريقة التسجيل للانضمام إلى مجتمع المبدعين:</p>
+            
+            <div style="display: flex; justify-content: center; margin-bottom: 10px;">
+                <div id="welcomeGoogleBtn"></div>
+            </div>
+
+            <div class="divider">أو الأدخال اليدوي</div>
+
+            <input type="text" id="regName" class="welcome-input" placeholder="الاسم الكريـم...">
+            <input type="number" id="regAge" class="welcome-input" placeholder="السن / العمر..." min="1" max="100">
             <button class="btn btn-primary" onclick="submitWelcomeRegistration()" style="width: 100%;">دخول عالم الليجو 🚀</button>
         </div>
     </div>
@@ -307,7 +320,7 @@
     <header class="navbar">
         <div class="nav-icons">
             <button class="menu-btn" onclick="toggleSideMenu()" title="القائمة">☰</button>
-            <div class="profile-btn" id="profileIcon" onclick="openAuthModal()" title="تسجيل الدخول">👤</div>
+            <div class="profile-btn" id="profileIcon" onclick="openAuthModal()" title="تسجيل الدخول / الملف الشخصي">👤</div>
         </div>
         <button class="lang-btn" onclick="toggleLanguage()" id="langToggleBtn">English 🌐</button>
     </header>
@@ -414,8 +427,7 @@
         <div class="chat-messages" id="chatMessages">
             <div class="chat-bubble bot" id="botWelcome">مرحباً بك! 👋 اختر أحد الأسئلة التالية للمساعدة والتوجيه:</div>
         </div>
-        <div class="chat-options-container" id="chatOptions">
-            </div>
+        <div class="chat-options-container" id="chatOptions"></div>
     </div>
 
     <div class="lightbox-modal" id="lightboxModal" onclick="closeZoom()">
@@ -463,18 +475,19 @@
             } catch (err) { console.error("فشل إرسال التنبيه لتيليجرام", err); }
         }
 
+        // التسجيل اليدوي
         function submitWelcomeRegistration() {
             const name = document.getElementById('regName').value.trim();
             const age = document.getElementById('regAge').value.trim();
 
-            if(!name || !age) {
-                alert("يرجى كتابة الاسم والعمر لمتابعة الدخول!");
+            if(!name) {
+                alert("يرجى إدخال اسمك على الأقل لمتابعة الدخول!");
                 return;
             }
 
             const userData = {
                 name: name,
-                age: age,
+                age: age || 'غير محدد',
                 email: name.toLowerCase().replace(/\s+/g, '') + "@lego.user",
                 picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=ffcf00&color=1e1e24&bold=true`
             };
@@ -482,8 +495,7 @@
             localStorage.setItem('lego_user', JSON.stringify(userData));
             document.getElementById('welcomeOverlay').style.display = 'none';
 
-            sendTelegramAlert(`🎉 عضو جديد دخل الموقع!\n👤 الاسم: ${name}\n🎂 السن: ${age} سنة`);
-
+            sendTelegramAlert(`🎉 عضو جديد سجل يدويًا!\n👤 الاسم: ${name}\n🎂 السن: ${userData.age} سنة`);
             checkPersistentLogin();
         }
 
@@ -495,7 +507,7 @@
                 joinBtn: "انضم إلينا الآن 🌟", galleryHeaderTitle: "معرض تصاميم ومجسمات الليجو 🧱✨", galleryHeaderDesc: "اضغط على أي صورة للتكبير والعبور لشاشة كاملة",
                 shareTitle: "شارك مشروعك 🚀", shareDesc: "قم برفع صورة تصميمك ليتم نشرها وحفظها لجميع زوار الموقع في المكتبة العامة:",
                 sendBtn: "إرسال المشروع 🔥", libraryTitle: "مكتبة التصاميم العامة 🖼️", libraryDesc: "جميع التصاميم والصور المرفوعة من قبل أعضاء ورائدي المجتمع:",
-                authTitle: "الملف الشخصي", authDesc: "بيانات حسابك الحالية:", closeAuthBtn: "إغلاق",
+                authTitle: "تسجيل الدخول / الحساب", authDesc: "قم بتسجيل الدخول عبر Google للوصول الكامل للميزات:", closeAuthBtn: "إغلاق",
                 modalTitle: "انضم إلى قنواتنا الرسمية!", modalDesc: "اشترك لتتابع أحدث شروحات البناء والتصاميم:",
                 ytBtn: "قناة YouTube 🎥", tgBtn: "قناة Telegram ✈️", googleText: "سجل دخولك الآن:", closeBtn: "إغلاق",
                 commentsTitle: "مجتمع الأعضاء والتعليقات العامة 💬", commentsDesc: "اكتب تعليقك هنا ليراه جميع زوار الموقع وتناقش مع المبدعين:",
@@ -509,7 +521,7 @@
                 joinBtn: "Join Us Now 🌟", galleryHeaderTitle: "Lego Builds & Designs Showcase 🧱✨", galleryHeaderDesc: "Click on any image to zoom into full screen",
                 shareTitle: "Share Your Project 🚀", shareDesc: "Upload your creation image to share it publicly in the designs library:",
                 sendBtn: "Send Project 🔥", libraryTitle: "Public Designs Library 🖼️", libraryDesc: "All community designs and creations uploaded by members:",
-                authTitle: "Profile Info", authDesc: "Your current account details:", closeAuthBtn: "Close",
+                authTitle: "Login / Profile", authDesc: "Sign in with Google to unlock full features:", closeAuthBtn: "Close",
                 modalTitle: "Join Our Official Channels!", modalDesc: "Subscribe to stay updated with Lego building techniques:",
                 ytBtn: "YouTube Channel 🎥", tgBtn: "Telegram Channel ✈️", googleText: "Sign in now:", closeBtn: "Close",
                 commentsTitle: "Community & Public Discussions 💬", commentsDesc: "Write your comment here for all visitors to view and discuss:",
@@ -549,31 +561,43 @@
             } else { 
                 welcomeOverlay.style.display = 'flex';
                 profileIcon.innerHTML = '👤'; 
+                setTimeout(renderGoogleButtons, 200);
             }
         }
 
+        // الاستجابة من جوجل عند التسجيل
         function handleCredentialResponse(response) {
-            const user = parseJwt(response.credential);
+            const googleUser = parseJwt(response.credential);
             const savedUser = JSON.parse(localStorage.getItem('lego_user') || '{}');
             
             const updatedUser = {
-                name: savedUser.name || user.name,
+                name: googleUser.name,
                 age: savedUser.age || 'غير محدد',
-                email: user.email,
-                picture: user.picture
+                email: googleUser.email,
+                picture: googleUser.picture
             };
 
             localStorage.setItem('lego_user', JSON.stringify(updatedUser));
-            checkPersistentLogin(); closeAuthModal(); closeModal();
-            alert("تم ربط الحساب بنجاح!");
+            sendTelegramAlert(`🌐 تسجيل دخول جديد عبر Google!\n👤 الاسم: ${googleUser.name}\n📧 الإيميل: ${googleUser.email}`);
+
+            checkPersistentLogin(); 
+            closeAuthModal(); 
+            closeModal();
+            alert(`مرحباً بك يا ${googleUser.name}! تم تسجيل الدخول بجوجل بنجاح.`);
             location.reload();
         }
 
+        // إظهار أزرار Google Sign-In
         function renderGoogleButtons() {
             if (window.google && google.accounts && google.accounts.id) {
                 google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleCredentialResponse });
+                
+                const welcomeBtn = document.getElementById('welcomeGoogleBtn');
+                if (welcomeBtn) google.accounts.id.renderButton(welcomeBtn, { theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with' });
+
                 const mainBtnContainer = document.getElementById('googleSignInBtn');
                 if (mainBtnContainer) google.accounts.id.renderButton(mainBtnContainer, { theme: 'outline', size: 'large', shape: 'pill' });
+
                 const subBtnContainer = document.getElementById('subscribeGoogleBtn');
                 if (subBtnContainer) google.accounts.id.renderButton(subBtnContainer, { theme: 'outline', size: 'large', shape: 'pill' });
             }
@@ -587,11 +611,11 @@
             if (savedUser) {
                 const user = JSON.parse(savedUser);
                 modalContent.innerHTML = `
-                    <img src="${user.picture}" style="width:70px; height:70px; border-radius:50%; margin-bottom:10px;">
+                    <img src="${user.picture}" style="width:75px; height:75px; border-radius:50%; margin-bottom:10px; border: 3px solid var(--yellow);">
                     <h3>${currentLang === 'ar' ? 'أهلاً بك،' : 'Welcome,'} ${user.name} 👋</h3>
                     <p style="color:#666; font-size:0.95rem; margin-top:5px;">العمر: ${user.age || 'غير محدد'} سنة</p>
                     <p style="color:#888; font-size:0.85rem; margin-bottom:20px;">${user.email}</p>
-                    <button class="btn btn-danger" onclick="logout()">${currentLang === 'ar' ? 'تغيير الحساب / خروج 🚪' : 'Change Profile / Logout 🚪'}</button>
+                    <button class="btn btn-danger" onclick="logout()">${currentLang === 'ar' ? 'تسجيل الخروج 🚪' : 'Logout 🚪'}</button>
                     <br><br><button class="btn" onclick="closeAuthModal()">${translations[currentLang].closeBtn}</button>`;
             } else {
                 modalContent.innerHTML = `
@@ -621,9 +645,7 @@
         function closeModal() { document.getElementById('subscribeModal').style.display = 'none'; }
         function enableNextStep() { document.getElementById('nextStep').style.display = 'block'; setTimeout(renderGoogleButtons, 100); }
 
-        /* ========================================================
-           منطق الشات بوت المحلي القائم على الخيارات والأسئلة المحددة
-        ======================================================== */
+        /* --- منطق الشات بوت --- */
         function toggleChatbot() {
             const chatWindow = document.getElementById('chatbotWindow');
             chatWindow.style.display = (chatWindow.style.display === 'flex') ? 'none' : 'flex';
@@ -678,10 +700,7 @@
             const replyText = currentLang === 'ar' ? questionObj.replyAr : questionObj.replyEn;
 
             appendChatBubble(questionText, 'user');
-
-            setTimeout(() => {
-                appendChatBubble(replyText, 'bot');
-            }, 300);
+            setTimeout(() => { appendChatBubble(replyText, 'bot'); }, 300);
         }
 
         function appendChatBubble(text, sender) {
@@ -854,7 +873,7 @@
         window.likeFirestoreDocument = async function(collectionName, docId, btn) {
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
             if (!currentUser) {
-                alert('يرجى إدخال اسمك أولاً!');
+                alert('يرجى تسجيل الدخول أولاً لتفاعل باللايكات!');
                 return;
             }
             const docRef = doc(db, collectionName, docId);
@@ -876,7 +895,7 @@
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
 
             if (!currentUser) {
-                alert('يرجى إدخال اسمك أولاً لنشر التعليق!');
+                alert('يرجى تسجيل الدخول أو إدخال اسمك أولاً لنشر التعليق!');
                 return;
             }
 
@@ -887,7 +906,7 @@
                         text: commentText, userName: currentUser.name, userEmail: currentUser.email,
                         userPic: currentUser.picture, likedBy: [], timestamp: new Date()
                     });
-                    sendTelegramAlert(`💬 تعليق جديد على الموقع:\n\nالكاتب: ${currentUser.name}\nالسن: ${currentUser.age || 'غير محدد'}\nالتعليق: ${commentText}`);
+                    sendTelegramAlert(`💬 تعليق جديد على الموقع:\n\nالكاتب: ${currentUser.name}\nالإيميل/الحساب: ${currentUser.email}\nالتعليق: ${commentText}`);
                     input.value = ''; localStorage.removeItem('lego_comment_draft');
                     alert('تم نشر التعليق بنجاح وحفظه!');
                 } catch(e) { console.error("Firebase Error:", e); alert('حدث خطأ أثناء حفظ التعليق!'); }
@@ -910,7 +929,7 @@
             const currentUser = JSON.parse(localStorage.getItem('lego_user'));
 
             if (!currentUser) {
-                alert('يرجى إدخال بياناتك أولاً لرفع المشاريع!');
+                alert('يرجى تسجيل الدخول أو إدخال بياناتك أولاً لرفع المشاريع!');
                 return;
             }
 
@@ -939,7 +958,7 @@
         window.deletePublicProject = async function(projectId) {
             if (confirm('هل أنت متأكد من رغبتك في حذف هذا المشروع؟')) {
                 try {
-                    await deleteDoc(doc(doc(db, "gallery", projectId)));
+                    await deleteDoc(doc(db, "gallery", projectId));
                     alert('تم حذف المشروع بنجاح!');
                 } catch (err) { console.error("خطأ حذف المشروع:", err); alert('فشل حذف المشروع!'); }
             }
